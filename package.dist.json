@@ -1,0 +1,15 @@
+{
+  "name": "@rmng/schematics",
+  "version": "0.1.0",
+  "description": "Collection of common angular schematics",
+  "keywords": [
+    "angular",
+    "schematics"
+  ],
+  "license": "MIT",
+  "schematics": "./collection.json",
+  "peerDependencies": {
+    "@angular/common": "^6.0.0",
+    "@angular/core": "^6.0.0"
+  }
+}

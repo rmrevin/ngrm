@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "SchematicsRmngPage",
+  "title": "RMNG page options schema",
+  "type": "object",
+  "description": "Helps to work with JSON:API",
+  "properties": {
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path at which to create the file",
+      "visible": false
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the page",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "Please, type name of the page"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
