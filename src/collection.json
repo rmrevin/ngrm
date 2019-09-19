@@ -5,6 +5,11 @@
       "description": "Create page module.",
       "factory": "./page/index#page",
       "schema": "./page/schema.json"
+    },
+    "api-factory": {
+      "description": "Create apy factory.",
+      "factory": "./api-factory/index#apiFactory",
+      "schema": "./api-factory/schema.json"
     }
   }
 }

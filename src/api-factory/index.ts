@@ -11,7 +11,7 @@ import {
 } from '@angular-devkit/schematics';
 import { Schema } from './schema';
 
-export function page (options: Schema): Rule {
+export function apiFactory (options: Schema): Rule {
   return () => {
     if (!options.name) {
       throw new SchematicsException('Option (name) is required.');
@@ -24,7 +24,7 @@ export function page (options: Schema): Rule {
           ...strings,
           ...options,
         }),
-        move(normalize(`${options.path}/${options.name}`)),
+        move(normalize(`${options.path}`)),
       ],
     );
 

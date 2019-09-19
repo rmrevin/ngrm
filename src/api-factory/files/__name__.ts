@@ -1,15 +1,21 @@
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { <%= classify(name) %>PageComponent } from './<%= name %>-page.component';
+import { HttpClient } from '@angular/common/http';
+import { ApiRequestSubject } from '@app/common/api-request.subject';
+import { map } from 'rxjs/operators';
 
-@NgModule({
-  imports: [
-    RouterModule.forChild([
-      { path: '', component: <%= classify(name) %>PageComponent },
-    ]),
-  ],
-  exports: [RouterModule],
-})
-export class <%= classify(name) %>PageRouting
+export interface Request
 {
+}
+
+// export type Response = any;
+export interface Response
+{
+}
+
+// tslint:disable-next-line:typedef
+export function factory (http: HttpClient) {
+  return new ApiRequestSubject<Request, Response>(
+    (request: Request) => http.get<Response>('').pipe(
+      map(response => response),
+    ),
+  );
 }

@@ -17,8 +17,6 @@ export function page (options: Schema): Rule {
       throw new SchematicsException('Option (name) is required.');
     }
 
-    console.log(url('./files'));
-
     const templateSource = apply(
       url('./files'),
       [
