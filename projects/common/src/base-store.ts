@@ -2,7 +2,7 @@ import { OnDestroy } from '@angular/core';
 import { cloneDeep, isEqual } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, filter, map, switchMap, take } from 'rxjs/operators';
-import { untilDestroyed } from '../operators';
+import { untilDestroyed } from './operators';
 
 export interface AbstractStorageInterface
 {
@@ -13,9 +13,9 @@ export interface AbstractStorageInterface
 
 export abstract class BaseStore<STATE> implements OnDestroy
 {
-  public readonly state = new BehaviorSubject<Readonly<STATE>>(null);
+  private readonly state = new BehaviorSubject<Readonly<STATE>>(null);
 
-  protected constructor (protected defaultState: STATE) {
+  protected constructor (protected defaultState: Readonly<STATE>) {
     this.state.next(defaultState);
   }
 
@@ -27,9 +27,9 @@ export abstract class BaseStore<STATE> implements OnDestroy
     return this.state.value;
   }
 
-  public update (patchState: Partial<STATE>): void {
+  public update (patchState: Readonly<Partial<STATE>>): void {
     this.state.next({
-      ...this.state.value,
+      ...this.snapshot,
       ...patchState,
     });
   }
@@ -50,7 +50,7 @@ export abstract class BaseStore<STATE> implements OnDestroy
   }
 
   protected syncState<STATE, K extends keyof STATE> (key: string, storage: AbstractStorageInterface, project: (state: any) => STATE) {
-    storage.getItem<STATE>(key).pipe(
+    storage.getItem<Readonly<STATE>>(key).pipe(
       take(1),
       filter(data => !!data),
     ).subscribe(data => this.update(data));

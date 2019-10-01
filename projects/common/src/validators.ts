@@ -1,5 +1,5 @@
 import { AbstractControl } from '@angular/forms';
-import * as moment from 'moment';
+import * as _moment from 'moment';
 import {
   clearPhone,
   validateCardNumber,
@@ -12,6 +12,9 @@ import {
   validateUuid,
 } from './functions';
 
+const moment = _moment;
+
+// @dynamic
 export class CommonValidators
 {
   static atLeastChecked (min = 1): (control: AbstractControl) => { atLeastChecked: true } | null {

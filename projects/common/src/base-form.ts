@@ -13,7 +13,7 @@ import {
 import { ParamMap, Router } from '@angular/router';
 import { isEqual, pick } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, skipWhile, takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, skipWhile, startWith, takeUntil } from 'rxjs/operators';
 
 export interface FormatRuleInterface
 {
@@ -34,9 +34,7 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   public readonly snapshot$ = new BehaviorSubject<T>(undefined);
   public readonly valueChanges: Observable<T>;
 
-  public readonly submitInProgress$ = new BehaviorSubject<boolean>(false);
-
-  public submitted$ = new BehaviorSubject<boolean>(false);
+  public readonly submitted$ = new BehaviorSubject<boolean>(false);
   public readonly destroyed$ = new EventEmitter<void>();
 
   private formInstance: FormGroupDirective;
@@ -48,7 +46,10 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   ) {
     super(controls, validatorOrOpts, asyncValidator);
 
-    this.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(this.value$);
+    this.valueChanges.pipe(
+      takeUntil(this.destroyed$),
+      startWith(this.value),
+    ).subscribe(this.value$);
 
     this.makeSnapshot();
   }
@@ -60,8 +61,6 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   }
 
   public ngOnDestroy (): void {
-    this.submitInProgress$.complete();
-
     this.value$.complete();
     this.snapshot$.complete();
 
@@ -72,7 +71,9 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   public setFormInstance (formInstance: FormGroupDirective): void {
     this.formInstance = formInstance;
 
-    this.formInstance.ngSubmit.subscribe(() => this.syncSubmitted());
+    this.formInstance.ngSubmit.pipe(
+      takeUntil(this.destroyed$),
+    ).subscribe(() => this.syncSubmitted());
   }
 
   public extractDataFromParams (params: ParamMap, key: string, formatRules?: Array<FormatRuleInterface>): T {
@@ -83,8 +84,7 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
         Object.keys(data).forEach(field =>
           formatRules
             .filter(rule => rule.fields.indexOf(field) > -1)
-            .forEach(rule => (data[field] = rule.formatter(data[field]))),
-        );
+            .forEach(rule => data[field] = rule.formatter(data[field])));
       }
     } else {
       this.reset();
@@ -184,7 +184,7 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   }
 
   public reset (value?: Partial<T>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
-    this.resetSubmitted(true);
+    this.resetSubmitted();
 
     super.reset(value, options);
 
@@ -196,14 +196,17 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     this.reset(this.value);
   }
 
-  public resetSubmitted (quiet: boolean = false): void {
+  public markAsSubmitted (value: boolean = true): void {
     if (this.formInstance) {
-      (this.formInstance as { submitted: boolean }).submitted = false;
-    } else if (!quiet) {
+      (this.formInstance as { submitted: boolean }).submitted = value;
+    } else {
       // @todo replace by logger service
       // console.warn('BaseForm: form instance is not set. Call setFormInstance(ngForm) after form initialized.');
     }
+  }
 
+  public resetSubmitted (): void {
+    this.markAsSubmitted(false);
     this.syncSubmitted();
   }
 
@@ -243,5 +246,8 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
 }
 
 function isEqualStruct<T> (keys?: Array<keyof T>): (x, y) => boolean {
-  return (x, y) => isEqual(keys ? pick(x, keys) : x, keys ? pick(y, keys) : y);
+  return (x, y) => isEqual(
+    keys ? pick(x, keys) : x,
+    keys ? pick(y, keys) : y,
+  );
 }
