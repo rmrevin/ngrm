@@ -207,4 +207,60 @@ export class CommonValidators
 
     return null;
   }
+
+  static lt (leftKey: string, rightKey: string): (control: AbstractControl) => { lt: true } | null {
+    return (control: AbstractControl) => {
+
+      const leftCtrl = control.get(leftKey);
+      const rightCtrl = control.get(rightKey);
+
+      if (leftCtrl.value && rightCtrl.value && leftCtrl.value >= rightCtrl.value) {
+        return {lt: true};
+      }
+
+      return null;
+    };
+  }
+
+  static lte (leftKey: string, rightKey: string): (control: AbstractControl) => { lte: true } | null {
+    return (control: AbstractControl) => {
+
+      const leftCtrl = control.get(leftKey);
+      const rightCtrl = control.get(rightKey);
+
+      if (leftCtrl.value && rightCtrl.value && leftCtrl.value > rightCtrl.value) {
+        return {lte: true};
+      }
+
+      return null;
+    };
+  }
+
+  static gt (leftKey: string, rightKey: string): (control: AbstractControl) => { gt: true } | null {
+    return (control: AbstractControl) => {
+
+      const leftCtrl = control.get(leftKey);
+      const rightCtrl = control.get(rightKey);
+
+      if (leftCtrl.value && rightCtrl.value && leftCtrl.value <= rightCtrl.value) {
+        return {gt: true};
+      }
+
+      return null;
+    };
+  }
+
+  static gte (leftKey: string, rightKey: string): (control: AbstractControl) => { gte: true } | null {
+    return (control: AbstractControl) => {
+
+      const leftCtrl = control.get(leftKey);
+      const rightCtrl = control.get(rightKey);
+
+      if (leftCtrl.value && rightCtrl.value && leftCtrl.value < rightCtrl.value) {
+        return {gte: true};
+      }
+
+      return null;
+    };
+  }
 }

@@ -1,9 +1,10 @@
 {
   "name": "@rmng/common",
-  "version": "0.1.0",
+  "version": "0.2.4",
   "peerDependencies": {
     "@angular/common": ">=6.0.0",
     "@angular/core": ">=6.0.0",
+    "debug": ">=4.0.0",
     "libphonenumber-js": ">=1.7.0",
     "lodash": ">=4.17.0",
     "moment": ">=2.24.0",

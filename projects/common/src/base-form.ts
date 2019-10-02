@@ -30,6 +30,7 @@ export interface FormErrorsCollection
 export class BaseForm<T> extends FormGroup implements OnDestroy
 {
   public readonly value: T;
+  public readonly defaultValue: T;
   public readonly value$ = new BehaviorSubject<T>(undefined);
   public readonly snapshot$ = new BehaviorSubject<T>(undefined);
   public readonly valueChanges: Observable<T>;
@@ -45,6 +46,8 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     asyncValidator?: AsyncValidatorFn | Array<AsyncValidatorFn> | null,
   ) {
     super(controls, validatorOrOpts, asyncValidator);
+
+    this.defaultValue = this.value;
 
     this.valueChanges.pipe(
       takeUntil(this.destroyed$),
@@ -186,13 +189,13 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   public reset (value?: Partial<T>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
     this.resetSubmitted();
 
-    super.reset(value, options);
+    super.reset(value || this.defaultValue, options);
 
     this.markAsUntouched();
     this.markAsPristine();
   }
 
-  public clearErrors (): void {
+  public resetErrors (): void {
     this.reset(this.value);
   }
 
