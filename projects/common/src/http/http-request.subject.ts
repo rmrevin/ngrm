@@ -62,13 +62,13 @@ export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
   /**
    * Метод для отладки состояния зафейлившегося api
    */
-  public makeFail (delayTime: number = 1000): Observable<Readonly<RESPONSE>> {
+  public makeFail (delayTime: number = 0): Observable<Readonly<RESPONSE>> {
     return this.executeRequest(() => {
       throw new Error('Fake fail emitted');
     }, delayTime);
   }
 
-  private executeRequest (requestFactory: () => Observable<HttpResponse<Readonly<RESPONSE>>>, delayTime: number = 1000): Observable<Readonly<RESPONSE>> {
+  private executeRequest (requestFactory: () => Observable<HttpResponse<Readonly<RESPONSE>>>, delayTime: number = 0): Observable<Readonly<RESPONSE>> {
     return of(true).pipe(
       take(1),
       tap(() => this.nextState({
