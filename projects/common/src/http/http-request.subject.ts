@@ -1,7 +1,7 @@
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { catchError, delay, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { catchError, delay, distinctUntilChanged, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 
 export enum HttpRequestStage
 {
@@ -11,10 +11,16 @@ export enum HttpRequestStage
   Success = 'success',
 }
 
+export interface HttpHeadersCollection
+{
+  [key: string]: Array<string>;
+}
+
 export interface HttpRequestState<DATA>
 {
   stage: HttpRequestStage;
-  status: number | undefined;
+  httpStatus: number | undefined;
+  httpHeaders: HttpHeadersCollection | undefined;
   data: Readonly<DATA> | undefined;
   error: any | undefined;
 }
@@ -23,7 +29,8 @@ export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
 {
   private readonly _state = new BehaviorSubject<HttpRequestState<RESPONSE>>({
     stage: HttpRequestStage.New,
-    status: undefined,
+    httpStatus: undefined,
+    httpHeaders: undefined,
     data: undefined,
     error: undefined,
   });
@@ -73,7 +80,8 @@ export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
       catchError((response: HttpErrorResponse) => {
         this.nextState({
           stage: HttpRequestStage.Failed,
-          status: response.status,
+          httpStatus: response.status,
+          httpHeaders: exportHeaders(response.headers),
           error: response.error,
         });
 
@@ -81,7 +89,8 @@ export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
       }),
       tap((response: HttpResponse<Readonly<RESPONSE>>) => this.nextState({
         stage: HttpRequestStage.Success,
-        status: response.status,
+        httpStatus: response.status,
+        httpHeaders: exportHeaders(response.headers),
         data: response.body,
       })),
       map((response: HttpResponse<Readonly<RESPONSE>>) => response.body),
@@ -109,19 +118,53 @@ export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
   }
 
   public get stage (): Observable<HttpRequestStage> {
-    return this._state.pipe(map(state => state.stage));
+    return this.state.pipe(
+      map(state => state.stage),
+      distinctUntilChanged(),
+    );
   }
 
-  public get status (): Observable<number> {
-    return this._state.pipe(map(state => state.status));
+  public get inProgress (): Observable<boolean> {
+    return this.state.pipe(
+      map(state => state.stage === HttpRequestStage.Pending),
+      distinctUntilChanged(),
+    );
+  }
+
+  public get isLoaded (): Observable<boolean> {
+    return this.state.pipe(
+      map(state => state.stage === HttpRequestStage.Success),
+      distinctUntilChanged(),
+    );
+  }
+
+  public get isError (): Observable<boolean> {
+    return this.state.pipe(
+      map(state => state.stage === HttpRequestStage.Failed),
+      distinctUntilChanged(),
+    );
+  }
+
+  public get httpStatus (): Observable<number> {
+    return this.state.pipe(
+      map(state => state.httpStatus),
+      distinctUntilChanged(),
+    );
+  }
+
+  public get httpHeaders (): Observable<HttpHeadersCollection> {
+    return this.state.pipe(
+      map(state => state.httpHeaders),
+      distinctUntilChanged(),
+    );
   }
 
   public get data (): Observable<Readonly<RESPONSE> | undefined> {
-    return this._state.pipe(map(state => state.data));
+    return this.state.pipe(map(state => state.data));
   }
 
   public get error (): Observable<any | undefined> {
-    return this._state.pipe(map(state => state.error));
+    return this.state.pipe(map(state => state.error));
   }
 
   // alias for ngOnDestroy
@@ -139,4 +182,16 @@ export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
     this.destroyed.next();
     this.destroyed.complete();
   }
+}
+
+function exportHeaders (headers: HttpHeaders): HttpHeadersCollection {
+  return headers.keys().reduce((result, key: string) => {
+    if (!result[key]) {
+      result[key] = [];
+    }
+
+    result[key] = headers.getAll(key);
+
+    return result;
+  }, {});
 }

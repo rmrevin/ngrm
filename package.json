@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "pub": "yarn publish dist/common --access public --no-commit-hooks"
+    "pub": "yarn publish dist/common --access public --no-git-tag-version"
   },
   "private": true,
   "dependencies": {

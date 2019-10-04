@@ -79,7 +79,7 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     ).subscribe(() => this.syncSubmitted());
   }
 
-  public extractDataFromParams (params: ParamMap, key: string, formatRules?: Array<FormatRuleInterface>): T {
+  public extractDataFromParams (params: ParamMap, key: string, formatRules?: Array<FormatRuleInterface>): Partial<T> {
     if (params.has(key)) {
       const data = JSON.parse(params.get(key));
 
@@ -89,11 +89,11 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
             .filter(rule => rule.fields.indexOf(field) > -1)
             .forEach(rule => data[field] = rule.formatter(data[field])));
       }
-    } else {
-      this.reset();
+
+      return data;
     }
 
-    return this.value;
+    return {};
   }
 
   public remember (key: string): (router: Router) => Promise<boolean> {
@@ -112,13 +112,11 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
         const filterData = this.extractDataFromParams(params, key, formatRules);
 
         this.patchValue(filterData, {emitEvent: true});
-
-        return filterData;
       } else {
         this.reset();
-
-        return this.value;
       }
+
+      return this.value;
     };
   }
 
