@@ -10,8 +10,8 @@ import { SrcsetPipe } from './srcset.pipe';
 const pipes = [HighlightPipe, MomentPipe, MoneyPipe, NumberPipe, PhonePipe, PluralPipe, SrcsetPipe];
 
 @NgModule({
-  declarations: [...pipes],
-  exports: [...pipes],
+  declarations: pipes,
+  exports: pipes,
 })
 export class FormatPipesModule
 {

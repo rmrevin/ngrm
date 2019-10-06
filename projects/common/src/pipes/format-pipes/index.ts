@@ -1,4 +1,3 @@
-export * from './format-pipes.module';
 export * from './highlight.pipe';
 export * from './moment.pipe';
 export * from './money.pipe';

@@ -1,8 +1,8 @@
-import * as _moment from 'moment-timezone';
+import * as _momentTz from 'moment-timezone';
 
-const moment = _moment;
+const moment = _momentTz;
 
-export function dateToUtc (date: _moment.Moment | Date | string): _moment.Moment | null {
+export function dateToUtc (date: _momentTz.Moment | Date | string): _momentTz.Moment | null {
   if (!date) {
     return null;
   }
@@ -10,7 +10,7 @@ export function dateToUtc (date: _moment.Moment | Date | string): _moment.Moment
   return moment(date).utcOffset(0, true);
 }
 
-export function dateFromUtc (date: _moment.Moment | Date | string): _moment.Moment | null {
+export function dateFromUtc (date: _momentTz.Moment | Date | string): _momentTz.Moment | null {
   if (!date) {
     return null;
   }
