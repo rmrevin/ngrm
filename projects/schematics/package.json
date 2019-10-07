@@ -8,7 +8,8 @@
     "copy:schema": "cd src && cp --parents */schema.json ../dist",
     "copy:files": "cd src && cp --parents -r */files ../dist",
     "copy:static": "cp src/collection.json dist && cp package.dist.json dist/package.json",
-    "test": "yarn build && jasmine src/**/*_spec.js"
+    "test": "yarn build && jasmine src/**/*_spec.js",
+    "pub": "yarn publish dist --access public --no-git-tag-version"
   },
   "keywords": [
     "schematics"
@@ -16,12 +17,16 @@
   "author": "",
   "license": "MIT",
   "schematics": "./dist/collection.json",
-  "dependencies": {
-    "@angular-devkit/core": "^8.1.2",
-    "@angular-devkit/schematics": "^8.1.2",
+  "devDependencies": {
+    "@angular-devkit/core": ">=6.0.0",
+    "@angular-devkit/schematics": ">=6.0.0",
     "@types/jasmine": "^3.3.9",
     "@types/node": "^8.0.31",
     "jasmine": "^3.3.1",
     "typescript": "~3.4.3"
+  },
+  "peerDependencies": {
+    "@angular-devkit/core": ">=6.0.0",
+    "@angular-devkit/schematics": ">=6.0.0"
   }
 }
