@@ -6,10 +6,10 @@ import * as path from 'path';
 const collectionPath = path.join(__dirname, '../collection.json');
 
 
-describe('rmng', () => {
+describe('ngrm', () => {
   it('works', () => {
     const runner = new SchematicTestRunner('schematics', collectionPath);
-    const tree = runner.runSchematic('rmng', {}, Tree.empty());
+    const tree = runner.runSchematic('ngrm', {}, Tree.empty());
 
     expect(tree.files).toEqual([]);
   });

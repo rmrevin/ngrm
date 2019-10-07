@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "id": "SchematicsRmngApiFactory",
+  "id": "SchematicsNgrmApiFactory",
   "title": "RMNG api factory options schema",
   "type": "object",
   "description": "Helps to create api provider factory",

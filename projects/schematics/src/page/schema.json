@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "id": "SchematicsRmngPage",
+  "id": "SchematicsNgrmPage",
   "title": "RMNG page options schema",
   "type": "object",
   "description": "Helps to work with JSON:API",
