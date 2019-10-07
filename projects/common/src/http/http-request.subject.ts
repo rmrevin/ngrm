@@ -2,6 +2,7 @@ import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/ht
 import { OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { catchError, delay, distinctUntilChanged, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { HttpHeadersCollection } from '../store';
 
 export enum HttpRequestStage
 {
@@ -9,11 +10,6 @@ export enum HttpRequestStage
   Pending = 'pending',
   Failed = 'failed',
   Success = 'success',
-}
-
-export interface HttpHeadersCollection
-{
-  [key: string]: Array<string>;
 }
 
 export interface HttpRequestState<DATA>
@@ -25,6 +21,9 @@ export interface HttpRequestState<DATA>
   error: any | undefined;
 }
 
+/**
+ * @deprecated use RemoteState
+ */
 export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
 {
   private readonly _state = new BehaviorSubject<HttpRequestState<RESPONSE>>({

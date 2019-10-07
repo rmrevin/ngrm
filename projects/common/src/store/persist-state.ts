@@ -2,21 +2,23 @@ import { OnDestroy } from '@angular/core';
 import { Observable, SubscriptionLike } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { untilDestroyed } from '../operators';
-import { Store } from './store';
+import { State } from './state';
 
-export interface CacheItemInterface
+export interface CacheItemInterface<T>
 {
-  get<T> (): Observable<T>;
+  get (): Observable<T>;
 
-  set<T> (value: T): Observable<T>;
+  set (value: T): Observable<T>;
+
+  remove (): Observable<void>;
 }
 
-export class PersistStore<STATE> extends Store<STATE> implements OnDestroy
+export class PersistState<STATE> extends State<STATE> implements OnDestroy
 {
   private autosave: SubscriptionLike;
 
   public constructor (protected defaultValue: STATE,
-                      private cacheItem: CacheItemInterface,
+                      private cacheItem: CacheItemInterface<STATE>,
                       autosave: boolean = true,
   ) {
     super(defaultValue);
@@ -29,7 +31,7 @@ export class PersistStore<STATE> extends Store<STATE> implements OnDestroy
   }
 
   public loadState (): void {
-    this.cacheItem.get<STATE>().pipe(
+    this.cacheItem.get().pipe(
       take(1),
       untilDestroyed(this),
       filter(data => !!data),

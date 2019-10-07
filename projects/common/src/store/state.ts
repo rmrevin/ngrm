@@ -1,32 +1,38 @@
 import { OnDestroy } from '@angular/core';
-import { cloneDeep, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-export class Store<STATE> extends BehaviorSubject<Readonly<STATE>> implements OnDestroy
+export class State<STATE> implements OnDestroy
 {
+  private _state: BehaviorSubject<Readonly<STATE>>;
+
   public constructor (protected defaultValue: STATE) {
-    super(defaultValue);
+    this._state = new BehaviorSubject<Readonly<STATE>>(defaultValue);
   }
 
-  public select<R> (project: (state: Readonly<STATE>) => Readonly<R>,
+  public get snapshot (): Readonly<STATE> {
+    return this._state.value;
+  }
+
+  public select<R> (project: (state: Readonly<STATE>) => R,
                     compareFn?: (a: STATE, b: STATE) => boolean,
   ): Observable<Readonly<R>> {
-    return this.asObservable().pipe(
+    return this._state.asObservable().pipe(
       distinctUntilChanged(compareFn ? compareFn : (a, b) => isEqual(project(a), project(b))),
       map(project),
     );
   }
 
   public update (patchState: Partial<STATE>): void {
-    this.next({
-      ...this.value,
+    this._state.next({
+      ...this.snapshot,
       ...patchState,
     });
   }
 
   public patch (stateMutation: (state: Readonly<STATE>) => void): void {
-    const state = cloneDeep(this.value);
+    const state = this.snapshot;
 
     stateMutation(state);
 
@@ -34,6 +40,6 @@ export class Store<STATE> extends BehaviorSubject<Readonly<STATE>> implements On
   }
 
   public ngOnDestroy (): void {
-    this.complete();
+    this._state.complete();
   }
 }
