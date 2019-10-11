@@ -1,4 +1,4 @@
-import { EventEmitter, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, EventEmitter, OnDestroy } from '@angular/core';
 import {
   AbstractControl,
   AbstractControlOptions,
@@ -47,7 +47,7 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   ) {
     super(controls, validatorOrOpts, asyncValidator);
 
-    this.defaultValue = this.value;
+    this.defaultValue = this.getRawValue();
 
     this.valueChanges.pipe(
       takeUntil(this.destroyed$),
@@ -77,6 +77,12 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     this.formInstance.ngSubmit.pipe(
       takeUntil(this.destroyed$),
     ).subscribe(() => this.syncSubmitted());
+  }
+
+  public asyncChanges (detector: ChangeDetectorRef): void {
+    this.statusChanges.pipe(
+      takeUntil(this.destroyed$),
+    ).subscribe(() => detector.markForCheck());
   }
 
   public extractDataFromParams (params: ParamMap, key: string, formatRules?: Array<FormatRuleInterface>): Partial<T> {

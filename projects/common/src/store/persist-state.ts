@@ -1,7 +1,6 @@
 import { OnDestroy } from '@angular/core';
-import { Observable, SubscriptionLike } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
-import { untilDestroyed } from '../operators';
+import { Observable, Subject, SubscriptionLike } from 'rxjs';
+import { take, takeUntil, tap } from 'rxjs/operators';
 import { State } from './state';
 
 export interface CacheItemInterface<T>
@@ -17,25 +16,34 @@ export class PersistState<STATE> extends State<STATE> implements OnDestroy
 {
   private autosave: SubscriptionLike;
 
+  private readonly destroyed = new Subject<void>();
+
   public constructor (protected defaultValue: STATE,
                       private cacheItem: CacheItemInterface<STATE>,
+                      autoload: boolean = false,
                       autosave: boolean = true,
   ) {
     super(defaultValue);
 
-    this.loadState();
+    if (autoload) {
+      this.loadState().subscribe();
+    }
 
     if (autosave) {
       this.enableAutosave();
     }
   }
 
-  public loadState (): void {
-    this.cacheItem.get().pipe(
+  public loadState (): Observable<STATE> {
+    return this.cacheItem.get().pipe(
       take(1),
-      untilDestroyed(this),
-      filter(data => !!data),
-    ).subscribe(data => this.update(data));
+      takeUntil(this.destroyed),
+      tap(data => {
+        if (!!data) {
+          this.update(data);
+        }
+      }),
+    );
   }
 
   public saveState (state: STATE): Observable<STATE> {
@@ -48,7 +56,7 @@ export class PersistState<STATE> extends State<STATE> implements OnDestroy
     }
 
     this.autosave = this.select<STATE>(state => state).pipe(
-      untilDestroyed(this),
+      takeUntil(this.destroyed),
     ).subscribe(state => this.saveState(state));
   }
 
@@ -61,6 +69,9 @@ export class PersistState<STATE> extends State<STATE> implements OnDestroy
   }
 
   public ngOnDestroy (): void {
+    this.destroyed.next();
+    this.destroyed.complete();
+
     super.ngOnDestroy();
   }
 }

@@ -3,43 +3,65 @@ import { isEqual } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-export class State<STATE> implements OnDestroy
-{
-  private _state: BehaviorSubject<Readonly<STATE>>;
+export type ProjectFn<STATE, RESULT> = (state: Readonly<STATE>) => RESULT;
+export type CompareFn<STATE> = (a: STATE, b: STATE) => boolean;
 
+export class State<STATE> extends BehaviorSubject<Readonly<STATE>> implements OnDestroy
+{
   public constructor (protected defaultValue: STATE) {
-    this._state = new BehaviorSubject<Readonly<STATE>>(defaultValue);
+    super(defaultValue);
   }
 
   public get snapshot (): Readonly<STATE> {
-    return this._state.value;
+    return this.value;
   }
 
-  public select<R> (project: (state: Readonly<STATE>) => R,
-                    compareFn?: (a: STATE, b: STATE) => boolean,
-  ): Observable<Readonly<R>> {
-    return this._state.asObservable().pipe(
-      distinctUntilChanged(compareFn ? compareFn : (a, b) => isEqual(project(a), project(b))),
-      map(project),
+  public select (): Observable<STATE>;
+  public select<R> (project: ProjectFn<STATE, R>, compareFn?: CompareFn<STATE>): Observable<R>;
+  public select<R> (project?: ProjectFn<STATE, R>, compareFn?: CompareFn<STATE>): Observable<R | STATE> {
+    if (!compareFn) {
+      compareFn = (a, b) => project ? isEqual(project(a), project(b)) : isEqual(a, b);
+    }
+
+    const stream = this.asObservable().pipe(
+      distinctUntilChanged(compareFn),
     );
+
+    if (!project) {
+      return stream;
+    }
+
+    return stream.pipe(map(project));
   }
 
-  public update (patchState: Partial<STATE>): void {
-    this._state.next({
-      ...this.snapshot,
-      ...patchState,
-    });
+  public reset (): void {
+    this.next(this.defaultValue);
   }
 
-  public patch (stateMutation: (state: Readonly<STATE>) => void): void {
+  public update (stateMutation: Partial<STATE>): void;
+  public update (stateMutation: (state: Readonly<STATE>) => void): void;
+  public update (stateMutation: Partial<STATE> | ((state: Readonly<STATE>) => void)): void {
     const state = this.snapshot;
 
-    stateMutation(state);
+    if (typeof stateMutation === 'function') {
+      stateMutation(state);
 
-    this.update(state);
+      this.next(state);
+    } else if (typeof state === 'object' && state !== null) {
+      this.next({
+        ...this.snapshot,
+        ...stateMutation,
+      });
+    } else {
+      this.next(stateMutation as STATE);
+    }
+  }
+
+  public complete (): void {
+    this.ngOnDestroy();
   }
 
   public ngOnDestroy (): void {
-    this._state.complete();
+    super.complete();
   }
 }

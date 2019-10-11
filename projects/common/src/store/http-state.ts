@@ -61,6 +61,7 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
           stage: RemoteStateStage.Failed,
           error: response.error,
           meta: {
+            url: response.url,
             status: response.status,
             headers: exportHeaders(response.headers),
           },
@@ -72,6 +73,7 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
         stage: RemoteStateStage.Success,
         data: response.body,
         meta: {
+          url: response.url,
           status: response.status,
           headers: exportHeaders(response.headers),
         },
@@ -82,12 +84,8 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
     );
   }
 
-  public get state (): Observable<RemoteStateData<RESPONSE>> {
-    return this.select(state => state);
-  }
-
   public get stage (): Observable<RemoteStateStage> {
-    return this.select(state => state.stage);
+    return this.select<RemoteStateStage>(state => state.stage);
   }
 
   public get inProgress (): Observable<boolean> {
@@ -106,7 +104,10 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
     return this.select(state => state.data);
   }
 
-  public get error (): Observable<any | undefined> {
+  /**
+   * Такое название геттера связано с конфликтом с методом error в rxjs/Subject
+   */
+  public get err (): Observable<any | undefined> {
     return this.select(state => state.error);
   }
 
@@ -120,12 +121,6 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
 
   public get httpHeaders (): Observable<HttpHeadersCollection | undefined> {
     return this.meta.pipe(map(meta => meta.headers));
-  }
-
-  // alias for ngOnDestroy
-  public complete (): void {
-    // tslint:disable-next-line:no-lifecycle-call
-    this.ngOnDestroy();
   }
 
   public ngOnDestroy (): void {

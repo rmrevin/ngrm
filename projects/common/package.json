@@ -1,6 +1,6 @@
 {
   "name": "@ngrm/common",
-  "version": "0.3.1",
+  "version": "0.3.16",
   "peerDependencies": {
     "@angular/common": ">=6.0.0",
     "@angular/core": ">=6.0.0",

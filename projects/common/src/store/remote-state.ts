@@ -72,12 +72,8 @@ export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPON
     );
   }
 
-  public get state (): Observable<RemoteStateData<RESPONSE>> {
-    return this.select(state => state);
-  }
-
   public get stage (): Observable<RemoteStateStage> {
-    return this.select(state => state.stage);
+    return this.select<RemoteStateStage>(state => state.stage);
   }
 
   public get inProgress (): Observable<boolean> {
@@ -96,18 +92,15 @@ export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPON
     return this.select(state => state.data);
   }
 
-  public get error (): Observable<any | undefined> {
+  /**
+   * Такое название геттера связано с конфликтом с методом error в rxjs/Subject
+   */
+  public get err (): Observable<any | undefined> {
     return this.select(state => state.error);
   }
 
   public get meta (): Observable<any | undefined> {
     return this.select(state => state.meta);
-  }
-
-  // alias for ngOnDestroy
-  public complete (): void {
-    // tslint:disable-next-line:no-lifecycle-call
-    this.ngOnDestroy();
   }
 
   public ngOnDestroy (): void {
