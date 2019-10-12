@@ -1,5 +1,6 @@
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { OnDestroy } from '@angular/core';
+import { cloneDeep } from 'lodash';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { catchError, delay, distinctUntilChanged, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { HttpHeadersCollection } from '../store';
@@ -109,7 +110,7 @@ export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
   // почему-то теряется интерфейс data в шаблонах
 
   public get snapshot (): HttpRequestState<RESPONSE> {
-    return this._state.value;
+    return cloneDeep(this._state.value);
   }
 
   public get state (): Observable<HttpRequestState<RESPONSE>> {

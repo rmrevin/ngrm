@@ -11,7 +11,7 @@ import {
   ValidatorFn,
 } from '@angular/forms';
 import { ParamMap, Router } from '@angular/router';
-import { isEqual, pick } from 'lodash';
+import { cloneDeep, isEqual, pick } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, skipWhile, startWith, takeUntil } from 'rxjs/operators';
 
@@ -127,7 +127,7 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   }
 
   public makeSnapshot (): void {
-    this.snapshot$.next(this.value);
+    this.snapshot$.next(cloneDeep(this.value));
   }
 
   public get (id: Array<string | number> | string): AbstractControl | null {

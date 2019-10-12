@@ -1,5 +1,5 @@
 import { OnDestroy } from '@angular/core';
-import { Observable, Subject, SubscriptionLike } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { take, takeUntil, tap } from 'rxjs/operators';
 import { State } from './state';
 
@@ -14,22 +14,26 @@ export interface CacheItemInterface<T>
 
 export class PersistState<STATE> extends State<STATE> implements OnDestroy
 {
-  private autosave: SubscriptionLike;
+  private ɵautosaveEnabled: boolean = this.autosave;
 
-  private readonly destroyed = new Subject<void>();
+  private readonly ɵloaded = new Subject<STATE>();
+  private readonly ɵdestroyed = new Subject<void>();
+  private readonly ɵstopAutosave = new Subject<void>();
 
   public constructor (protected defaultValue: STATE,
                       private cacheItem: CacheItemInterface<STATE>,
-                      autoload: boolean = false,
-                      autosave: boolean = true,
+                      private autoload: boolean = true,
+                      private autosave: boolean = true,
   ) {
     super(defaultValue);
 
     if (autoload) {
-      this.loadState().subscribe();
-    }
-
-    if (autosave) {
+      this.loadState().subscribe(() => {
+        if (autosave) {
+          this.enableAutosave();
+        }
+      });
+    } else if (autosave) {
       this.enableAutosave();
     }
   }
@@ -37,10 +41,11 @@ export class PersistState<STATE> extends State<STATE> implements OnDestroy
   public loadState (): Observable<STATE> {
     return this.cacheItem.get().pipe(
       take(1),
-      takeUntil(this.destroyed),
+      takeUntil(this.ɵdestroyed),
       tap(data => {
         if (!!data) {
           this.update(data);
+          this.ɵloaded.next(data);
         }
       }),
     );
@@ -50,27 +55,44 @@ export class PersistState<STATE> extends State<STATE> implements OnDestroy
     return this.cacheItem.set(state);
   }
 
+  public get loaded (): Observable<STATE> {
+    return this.ɵloaded.asObservable();
+  }
+
+  public get autosaveEnabled (): boolean {
+    return this.ɵautosaveEnabled;
+  }
+
   public enableAutosave (): void {
-    if (this.autosave) {
+    if (this.autosaveEnabled) {
       return;
     }
 
-    this.autosave = this.select<STATE>(state => state).pipe(
-      takeUntil(this.destroyed),
+    this.select().pipe(
+      takeUntil(this.ɵdestroyed),
+      takeUntil(this.ɵstopAutosave),
+      tap(() => this.ɵautosaveEnabled = true),
     ).subscribe(state => this.saveState(state));
   }
 
   public disableAutosave (): void {
-    if (!this.autosave) {
+    if (!this.autosaveEnabled) {
       return;
     }
 
-    this.autosave.unsubscribe();
+    this.ɵstopAutosave.next();
+
+    this.ɵautosaveEnabled = false;
   }
 
   public ngOnDestroy (): void {
-    this.destroyed.next();
-    this.destroyed.complete();
+    this.ɵdestroyed.next();
+    this.ɵdestroyed.complete();
+
+    this.ɵstopAutosave.next();
+    this.ɵstopAutosave.complete();
+
+    this.ɵloaded.complete();
 
     super.ngOnDestroy();
   }

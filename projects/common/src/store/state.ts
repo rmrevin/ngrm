@@ -1,5 +1,5 @@
 import { OnDestroy } from '@angular/core';
-import { isEqual } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
@@ -13,7 +13,7 @@ export class State<STATE> extends BehaviorSubject<Readonly<STATE>> implements On
   }
 
   public get snapshot (): Readonly<STATE> {
-    return this.value;
+    return cloneDeep(this.value);
   }
 
   public select (): Observable<STATE>;
@@ -38,15 +38,11 @@ export class State<STATE> extends BehaviorSubject<Readonly<STATE>> implements On
     this.next(this.defaultValue);
   }
 
-  public update (stateMutation: Partial<STATE>): void;
-  public update (stateMutation: (state: Readonly<STATE>) => void): void;
-  public update (stateMutation: Partial<STATE> | ((state: Readonly<STATE>) => void)): void {
+  public update (stateMutation: Partial<STATE> | ((state: STATE) => STATE)): void {
     const state = this.snapshot;
 
     if (typeof stateMutation === 'function') {
-      stateMutation(state);
-
-      this.next(state);
+      this.next(stateMutation(state));
     } else if (typeof state === 'object' && state !== null) {
       this.next({
         ...this.snapshot,
