@@ -3,16 +3,17 @@ import { cloneDeep, isEqual } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-export type ProjectFn<STATE, RESULT> = (state: Readonly<STATE>) => RESULT;
+export type ProjectFn<STATE, RESULT> = (state: STATE) => RESULT;
 export type CompareFn<STATE> = (a: STATE, b: STATE) => boolean;
+export type ReducerFn<STATE> = (state: STATE) => STATE;
 
-export class State<STATE> extends BehaviorSubject<Readonly<STATE>> implements OnDestroy
+export class State<STATE> extends BehaviorSubject<STATE> implements OnDestroy
 {
-  public constructor (protected defaultValue: STATE) {
+  public constructor (protected readonly defaultValue: STATE) {
     super(defaultValue);
   }
 
-  public get snapshot (): Readonly<STATE> {
+  public get snapshot (): STATE {
     return cloneDeep(this.value);
   }
 
@@ -23,33 +24,28 @@ export class State<STATE> extends BehaviorSubject<Readonly<STATE>> implements On
       compareFn = (a, b) => project ? isEqual(project(a), project(b)) : isEqual(a, b);
     }
 
-    const stream = this.asObservable().pipe(
+    return this.asObservable().pipe(
       distinctUntilChanged(compareFn),
+      map(state => project ? project(state) : state),
     );
-
-    if (!project) {
-      return stream;
-    }
-
-    return stream.pipe(map(project));
   }
 
   public reset (): void {
     this.next(this.defaultValue);
   }
 
-  public update (stateMutation: Partial<STATE> | ((state: STATE) => STATE)): void {
+  public update (nextState: Partial<STATE> | ReducerFn<STATE>): void {
     const state = this.snapshot;
 
-    if (typeof stateMutation === 'function') {
-      this.next(stateMutation(state));
+    if (typeof nextState === 'function') {
+      this.next(nextState(state));
     } else if (typeof state === 'object' && state !== null) {
       this.next({
         ...this.snapshot,
-        ...stateMutation,
+        ...nextState,
       });
     } else {
-      this.next(stateMutation as STATE);
+      this.next(<STATE>nextState);
     }
   }
 

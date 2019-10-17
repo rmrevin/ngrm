@@ -1,6 +1,6 @@
 import { OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { take, takeUntil, tap } from 'rxjs/operators';
+import { skip, take, takeUntil, tap } from 'rxjs/operators';
 import { State } from './state';
 
 export interface CacheItemInterface<T>
@@ -14,7 +14,7 @@ export interface CacheItemInterface<T>
 
 export class PersistState<STATE> extends State<STATE> implements OnDestroy
 {
-  private ɵautosaveEnabled: boolean = this.autosave;
+  private ɵautosaveEnabled: boolean;
 
   private readonly ɵloaded = new Subject<STATE>();
   private readonly ɵdestroyed = new Subject<void>();
@@ -44,7 +44,7 @@ export class PersistState<STATE> extends State<STATE> implements OnDestroy
       takeUntil(this.ɵdestroyed),
       tap(data => {
         if (!!data) {
-          this.update(data);
+          this.next(data);
           this.ɵloaded.next(data);
         }
       }),
@@ -72,6 +72,7 @@ export class PersistState<STATE> extends State<STATE> implements OnDestroy
       takeUntil(this.ɵdestroyed),
       takeUntil(this.ɵstopAutosave),
       tap(() => this.ɵautosaveEnabled = true),
+      skip(1),
     ).subscribe(state => this.saveState(state));
   }
 
