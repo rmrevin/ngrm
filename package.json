@@ -21,7 +21,6 @@
     "@angular/platform-browser-dynamic": "~8.2.3",
     "@angular/router": "~8.2.3",
     "debug": "^4.1.1",
-    "libphonenumber-js": "^1.7.25",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
