@@ -10,7 +10,7 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
   private readonly destroyed = new Subject<void>();
   private readonly abort = new Subject<void>();
 
-  public constructor (private requestTransport: (params?: REQUEST) => Observable<HttpResponse<Readonly<RESPONSE>>>) {
+  public constructor (private requestTransport: (params?: REQUEST) => Observable<HttpResponse<RESPONSE>>) {
     super({
       stage: RemoteStateStage.New,
       data: undefined,
@@ -22,7 +22,7 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
   /**
    * Метод для однопоточного получения данных (все предыдущие запросы будут автоматически отменены)
    */
-  public fetch (params?: REQUEST, delayTime: number = 0): Observable<Readonly<RESPONSE>> {
+  public fetch (params?: REQUEST, delayTime: number = 0): Observable<RESPONSE> {
 
     this.abort.next();
 
@@ -32,7 +32,7 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
   /**
    * Метод для простой отправки запроса (отменять повторые запросы нужно вручную)
    */
-  public send (params?: REQUEST, delayTime: number = 0): Observable<Readonly<RESPONSE>> {
+  public send (params?: REQUEST, delayTime: number = 0): Observable<RESPONSE> {
     return this.executeRequest((): any => {
       return this.requestTransport(params);
     }, delayTime);
@@ -41,13 +41,13 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
   /**
    * Метод для отладки состояния зафейлившегося api
    */
-  public makeFail (delayTime: number = 0, message: string = 'Fake fail emitted'): Observable<Readonly<RESPONSE>> {
+  public makeFail (delayTime: number = 0, message: string = 'Fake fail emitted'): Observable<RESPONSE> {
     return this.executeRequest(() => {
       throw new Error(message);
     }, delayTime);
   }
 
-  private executeRequest (requestFactory: () => Observable<HttpResponse<Readonly<RESPONSE>>>, delayTime: number = 0): Observable<Readonly<RESPONSE>> {
+  private executeRequest (requestFactory: () => Observable<HttpResponse<RESPONSE>>, delayTime: number = 0): Observable<RESPONSE> {
     return of(true).pipe(
       take(1),
       tap(() => this.update({
@@ -69,7 +69,7 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
 
         throw response;
       }),
-      tap((response: HttpResponse<Readonly<RESPONSE>>) => this.update({
+      tap((response: HttpResponse<RESPONSE>) => this.update({
         stage: RemoteStateStage.Success,
         data: response.body,
         meta: {
@@ -78,7 +78,7 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
           headers: exportHeaders(response.headers),
         },
       })),
-      map((response: HttpResponse<Readonly<RESPONSE>>) => response.body),
+      map((response: HttpResponse<RESPONSE>) => response.body),
       takeUntil(this.destroyed),
       takeUntil(this.abort),
     );
@@ -100,7 +100,7 @@ export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE
     return this.stage.pipe(map(stage => stage === RemoteStateStage.Failed));
   }
 
-  public get data (): Observable<Readonly<RESPONSE> | undefined> {
+  public get data (): Observable<RESPONSE | undefined> {
     return this.select(state => state.data);
   }
 

@@ -1,7 +1,7 @@
 import { OnDestroy } from '@angular/core';
 import { cloneDeep, isEqual } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { distinctUntilChanged, map, skipWhile } from 'rxjs/operators';
 
 export type ProjectFn<STATE, RESULT> = (state: STATE) => RESULT;
 export type CompareFn<STATE> = (a: STATE, b: STATE) => boolean;
@@ -27,6 +27,20 @@ export class State<STATE> extends BehaviorSubject<STATE> implements OnDestroy
     return this.asObservable().pipe(
       distinctUntilChanged(compareFn),
       map(state => project ? project(state) : state),
+    );
+  }
+
+  public waitFor (): Observable<STATE>;
+  public waitFor<R> (project: ProjectFn<STATE, R>, compareFn?: CompareFn<STATE>): Observable<R>;
+  public waitFor<R> (project?: ProjectFn<STATE, R>, compareFn?: CompareFn<STATE>): Observable<R | STATE> {
+    return this.select(project, compareFn).pipe(
+      skipWhile(data => {
+        if (Array.isArray(data)) {
+          return data.length === 0;
+        }
+
+        return !data;
+      }),
     );
   }
 
