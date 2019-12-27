@@ -11,6 +11,7 @@ export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPON
 
   public constructor (private requestTransport: (params?: REQUEST) => Observable<RESPONSE>) {
     super({
+      inProgress: false,
       stage: RemoteStateStage.New,
       data: undefined,
       error: undefined,
@@ -50,7 +51,7 @@ export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPON
     return of(true).pipe(
       take(1),
       tap(() => this.update({
-        stage: RemoteStateStage.Pending,
+        inProgress: true,
         error: undefined,
       })),
       delay(delayTime),
@@ -58,6 +59,7 @@ export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPON
       catchError(error => {
         this.update({
           stage: RemoteStateStage.Failed,
+          inProgress: false,
           error,
         });
 
@@ -65,6 +67,7 @@ export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPON
       }),
       tap((data: RESPONSE) => this.update({
         stage: RemoteStateStage.Success,
+        inProgress: false,
         data,
       })),
       takeUntil(this.destroyed),
@@ -72,28 +75,65 @@ export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPON
     );
   }
 
+  /**
+   * Get the current stage of request execution
+   */
   public get stage (): Observable<RemoteStateStage> {
     return this.select<RemoteStateStage>(state => state.stage);
   }
 
+  /**
+   * Check that the request is in progress.
+   */
   public get inProgress (): Observable<boolean> {
-    return this.stage.pipe(map(stage => stage === RemoteStateStage.Pending));
+    return this.select<boolean>(state => state.inProgress);
   }
 
-  public get isLoaded (): Observable<boolean> {
+  /**
+   * Check that the request has not yet been sent.
+   */
+  public get isUntouched (): Observable<boolean> {
+    return this.stage.pipe(map(stage => stage === RemoteStateStage.New));
+  }
+
+  /**
+   * Check that the request has yet been sent.
+   */
+  public get isTouched (): Observable<boolean> {
+    return this.stage.pipe(map(stage => stage !== RemoteStateStage.New));
+  }
+
+  /**
+   * Check that the request has been completed (no matter what the result is)
+   */
+  public get isCompleted (): Observable<boolean> {
+    return this.stage.pipe(map(stage => stage === RemoteStateStage.Success || stage === RemoteStateStage.Failed));
+  }
+
+  /**
+   * Check that the request was successful.
+   */
+  public get isSuccessful (): Observable<boolean> {
     return this.stage.pipe(map(stage => stage === RemoteStateStage.Success));
   }
 
-  public get isError (): Observable<boolean> {
+  /**
+   * Check that the request failed
+   */
+  public get isFailed (): Observable<boolean> {
     return this.stage.pipe(map(stage => stage === RemoteStateStage.Failed));
   }
 
+  /**
+   * Get response body
+   */
   public get data (): Observable<RESPONSE | undefined> {
     return this.select(state => state.data);
   }
 
   /**
-   * Такое название геттера связано с конфликтом с методом error в rxjs/Subject
+   * Get response error
+   * This getter name is in conflict with the error method in rxjs/Subject
    */
   public get err (): Observable<any | undefined> {
     return this.select(state => state.error);

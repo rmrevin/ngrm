@@ -63,6 +63,16 @@ export class State<STATE> extends BehaviorSubject<STATE> implements OnDestroy
     }
   }
 
+  public transaction<R> (fn: (state: STATE) => R): R {
+    const state = this.snapshot;
+
+    const result = fn(state);
+
+    this.next(state);
+
+    return result;
+  }
+
   public complete (): void {
     this.ngOnDestroy();
   }

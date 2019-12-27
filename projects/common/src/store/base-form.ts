@@ -27,6 +27,8 @@ export interface FormErrorsCollection
   [key: string]: ValidationErrors & { children?: FormErrorsCollection };
 }
 
+export type FormControlPath = Array<string | number> | string;
+
 export class BaseForm<T> extends FormGroup implements OnDestroy
 {
   public readonly value: T;
@@ -39,6 +41,10 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
   public readonly destroyed$ = new EventEmitter<void>();
 
   private formInstance: FormGroupDirective;
+
+  /*
+   * Lifecycle
+   */
 
   public constructor (
     controls: { [key: string]: AbstractControl },
@@ -71,6 +77,20 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     this.destroyed$.complete();
   }
 
+  /**
+   * @deprecated
+   * @param detector
+   */
+  public asyncChanges (detector: ChangeDetectorRef): void {
+    this.statusChanges.pipe(
+      takeUntil(this.destroyed$),
+    ).subscribe(() => detector.markForCheck());
+  }
+
+  /*
+   * Form instance
+   */
+
   public setFormInstance (formInstance: FormGroupDirective): void {
     this.formInstance = formInstance;
 
@@ -79,13 +99,50 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     ).subscribe(() => this.syncSubmitted());
   }
 
-  public asyncChanges (detector: ChangeDetectorRef): void {
-    this.statusChanges.pipe(
-      takeUntil(this.destroyed$),
-    ).subscribe(() => detector.markForCheck());
+  public markAsSubmitted (value: boolean = true): void {
+    if (this.formInstance) {
+      (this.formInstance as { submitted: boolean }).submitted = value;
+    } else {
+      // @todo replace by logger service
+      // console.warn('BaseForm: form instance is not set. Call setFormInstance(ngForm) after form initialized.');
+    }
   }
 
-  public extractDataFromParams (params: ParamMap, key: string, formatRules?: Array<FormatRuleInterface>): Partial<T> {
+  protected syncSubmitted (): void {
+    if (this.formInstance) {
+      this.submitted$.next(this.formInstance.submitted);
+    }
+  }
+
+  /*
+   * Query string interaction
+   */
+
+  public remember (key: string): (router: Router) => Promise<boolean> {
+    return (router: Router) => {
+      return router.navigate([], { queryParams: { [key]: JSON.stringify(this.value) } }).then(result => {
+        this.makeSnapshot();
+
+        return result;
+      });
+    };
+  }
+
+  public restore (key: string, formatRules?: Array<FormatRuleInterface>): (params: ParamMap) => T {
+    return (params: ParamMap) => {
+      if (params.has(key)) {
+        const filterData = this.extractDataFromParams(params, key, formatRules);
+
+        this.patchValue(filterData, { emitEvent: true });
+      } else {
+        this.reset();
+      }
+
+      return this.value;
+    };
+  }
+
+  protected extractDataFromParams (params: ParamMap, key: string, formatRules?: Array<FormatRuleInterface>): Partial<T> {
     if (params.has(key)) {
       const data = JSON.parse(params.get(key));
 
@@ -102,35 +159,19 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     return {};
   }
 
-  public remember (key: string): (router: Router) => Promise<boolean> {
-    return (router: Router) => {
-      return router.navigate([], {queryParams: {[key]: JSON.stringify(this.value)}}).then(result => {
-        this.makeSnapshot();
+  /*
+   * Form value interaction
+   */
 
-        return result;
-      });
-    };
-  }
-
-  public restore (key: string, formatRules?: Array<FormatRuleInterface>): (params: ParamMap) => T {
-    return (params: ParamMap) => {
-      if (params.has(key)) {
-        const filterData = this.extractDataFromParams(params, key, formatRules);
-
-        this.patchValue(filterData, {emitEvent: true});
-      } else {
-        this.reset();
-      }
-
-      return this.value;
-    };
+  public patchValue (value: Partial<T>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
+    super.patchValue(value, options);
   }
 
   public makeSnapshot (): void {
     this.snapshot$.next(cloneDeep(this.value));
   }
 
-  public get (id: Array<string | number> | string): AbstractControl | null {
+  public get (id: FormControlPath): AbstractControl | null {
     const result = super.get(id);
 
     if (!result && console) {
@@ -140,31 +181,31 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     return result;
   }
 
-  public group (id: string): FormGroup | null {
-    const result = this.get(id) as FormGroup | null;
+  public group (controlId: FormControlPath): FormGroup | null {
+    const result = this.get(controlId) as FormGroup | null;
 
     if (!result && console) {
-      console.warn(`Form group "${id}" not found.`);
+      console.warn(`Form group "${controlId}" not found.`);
     }
 
     return result;
   }
 
-  public control (id: string): FormControl | null {
-    const result = this.get(id) as FormControl | null;
+  public control (controlId: FormControlPath): FormControl | null {
+    const result = this.get(controlId) as FormControl | null;
 
     if (!result && console) {
-      console.warn(`Form control "${id}" not found.`);
+      console.warn(`Form control "${controlId}" not found.`);
     }
 
     return result;
   }
 
-  public array (id: string): FormArray | null {
-    const result = this.get(id) as FormArray | null;
+  public array (controlId: FormControlPath): FormArray | null {
+    const result = this.get(controlId) as FormArray | null;
 
     if (!result && console) {
-      console.warn(`Form array "${id}" not found.`);
+      console.warn(`Form array "${controlId}" not found.`);
     }
 
     return result;
@@ -174,7 +215,7 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     return Object.keys(this.group(id).controls);
   }
 
-  public onValuesChanged (keys?: Array<keyof T>): Observable<T> {
+  public onValuesChanged (keys?: Array<keyof T | string>): Observable<T> {
     return this.value$.pipe(
       takeUntil(this.destroyed$),
       skipWhile(value => !value),
@@ -182,13 +223,17 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     );
   }
 
-  public onSnapshotChanged (keys?: Array<keyof T>): Observable<T> {
+  public onSnapshotChanged (keys?: Array<keyof T | string>): Observable<T> {
     return this.snapshot$.pipe(
       takeUntil(this.destroyed$),
       skipWhile(value => !value),
       distinctUntilChanged(isEqualStruct<T>(keys)),
     );
   }
+
+  /*
+   * Reset
+   */
 
   public reset (value?: Partial<T>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
     this.resetSubmitted();
@@ -203,25 +248,36 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
     this.reset(this.value);
   }
 
-  public markAsSubmitted (value: boolean = true): void {
-    if (this.formInstance) {
-      (this.formInstance as { submitted: boolean }).submitted = value;
-    } else {
-      // @todo replace by logger service
-      // console.warn('BaseForm: form instance is not set. Call setFormInstance(ngForm) after form initialized.');
-    }
-  }
-
   public resetSubmitted (): void {
     this.markAsSubmitted(false);
     this.syncSubmitted();
   }
 
-  public patchValue (value: Partial<T>, options?: { onlySelf?: boolean; emitEvent?: boolean }): void {
-    super.patchValue(value, options);
+  /*
+   * Validation and errors
+   */
+
+  public validateManual (controlId: string, error: string): (is: boolean) => void {
+    return (is: boolean): void => {
+      const ctrl = this.control(controlId);
+
+      const nextErrors = {
+        ...(ctrl.errors || {}),
+      };
+
+      if (nextErrors.hasOwnProperty(error)) {
+        delete nextErrors[error];
+      }
+
+      if (is) {
+        nextErrors[error] = true;
+      }
+
+      ctrl.setErrors(Object.keys(nextErrors).length > 0 ? nextErrors : null);
+    };
   }
 
-  public getErrors (path?: string): FormErrorsCollection {
+  public getErrors (controlId?: FormControlPath): FormErrorsCollection {
     const fetchErrors = (controls: { [key: string]: AbstractControl } | Array<AbstractControl>) => {
       const result = {};
 
@@ -242,17 +298,11 @@ export class BaseForm<T> extends FormGroup implements OnDestroy
       return result;
     };
 
-    return fetchErrors(path ? this.group(path).controls : this.controls);
-  }
-
-  private syncSubmitted (): void {
-    if (this.formInstance) {
-      this.submitted$.next(this.formInstance.submitted);
-    }
+    return fetchErrors(controlId ? this.group(controlId).controls : this.controls);
   }
 }
 
-function isEqualStruct<T> (keys?: Array<keyof T>): (x, y) => boolean {
+function isEqualStruct<T> (keys?: Array<keyof T | string>): (x, y) => boolean {
   return (x, y) => isEqual(
     keys ? pick(x, keys) : x,
     keys ? pick(y, keys) : y,
