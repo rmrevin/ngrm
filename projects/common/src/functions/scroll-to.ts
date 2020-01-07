@@ -1,5 +1,5 @@
 export function scrollToTop (behavior: ScrollBehavior = 'auto'): void {
-  scrollTo({top: 0, left: 0, behavior});
+  scrollTo({ top: 0, left: 0, behavior });
 }
 
 export function scrollTo (options?: ScrollToOptions): void {

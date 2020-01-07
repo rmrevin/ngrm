@@ -1,5 +1,5 @@
 import { hashCode } from './hash-code';
-import { ruPpuntoSwitcher } from './punto-switcher';
+import { ruPpuntoSwitcher } from './punto-switcher-ru-en';
 import { safeRegexpString } from './safe-regexp-string';
 
 const cache: { [key: number]: RegExp } = {};

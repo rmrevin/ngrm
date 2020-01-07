@@ -856,6 +856,27 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@ngrm/common@~0.5.0":
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@ngrm/common/-/common-0.5.4.tgz#e85cece36273d8abaa7de1e0f3d5ca5970cfc2d3"
+  integrity sha512-x+YlVCNM5HUH7WVOzFVQilGBDGBre9Jqd8qvy3rcEFrqq41ld8S4qnSl5KUPAn7P76HTlzTjsTpxZZsSjEZEZw==
+  dependencies:
+    tslib "^1.9.0"
+
+"@ngrm/forms@~0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrm/forms/-/forms-0.1.0.tgz#a2973b268b76c96836e0341cb639feecd6ca85b4"
+  integrity sha512-aj4gafjbCbHpxzWQx4FhxM7GUyxFWe3Cw/QuKXG9GrWSGa5ce9B41KbPO9VWdjxjjZOCX2Oc+U1RVgy1dktbjg==
+  dependencies:
+    tslib "^1.9.0"
+
+"@ngrm/store@~0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@ngrm/store/-/store-0.1.0.tgz#3cf0956054ab99864d80ffed8de2ac17dc15ace5"
+  integrity sha512-1a13bfwvi6NaoiKJY+MPr6m+2wqsyM8xerwZt7Q62m0IkcBr3f3B/iNRfWoLDqkRvvYpO0VibO1wl+uax3tKww==
+  dependencies:
+    tslib "^1.9.0"
+
 "@ngtools/webpack@8.3.10":
   version "8.3.10"
   resolved "https://registry.yarnpkg.com/@ngtools/webpack/-/webpack-8.3.10.tgz#c5d970c76a8153cd46c73e4bad9622363b727b37"

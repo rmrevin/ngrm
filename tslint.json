@@ -25,7 +25,6 @@
       {
         "order": [
           "static-field",
-          "instance-field",
           "static-method",
           "instance-method"
         ]
@@ -60,6 +59,21 @@
       true,
       "single"
     ],
+    "space-before-function-paren": [
+      true, {
+        "anonymous": "always",
+        "asyncArrow": "always",
+        "constructor": "always",
+        "method": "always",
+        "named": "always"
+      }
+    ],
+    "one-line": [
+      true,
+      "check-catch",
+      "check-else",
+      "check-whitespace"
+    ],
     "trailing-comma": false,
     "component-class-suffix": true,
     "contextual-lifecycle": true,
@@ -75,6 +89,14 @@
     "template-banana-in-box": true,
     "template-no-negated-async": true,
     "use-lifecycle-interface": true,
-    "use-pipe-transform-interface": true
+    "use-pipe-transform-interface": true,
+    "variable-name": false,
+    "component-selector": [
+      true,
+      "element",
+      "app",
+      "ui",
+      "kebab-case"
+    ]
   }
 }

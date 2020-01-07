@@ -12,6 +12,9 @@ export interface CacheItemInterface<T>
   remove (): Observable<void>;
 }
 
+/**
+ * @deprecated use PersistanceStore from package @ngrm/store
+ */
 export class PersistState<STATE> extends State<STATE> implements OnDestroy
 {
   private ɵautosaveEnabled: boolean;

@@ -1,3 +1,4 @@
+export * from './check-fn';
 export * from './clear-phone';
 export * from './create-search-regexp';
 export * from './debug';
@@ -7,7 +8,7 @@ export * from './intl-plural';
 export * from './money-format';
 export * from './number-format';
 export * from './prevent';
-export * from './punto-switcher';
+export * from './punto-switcher-ru-en';
 export * from './safe-regexp-string';
 export * from './scroll-to';
 export * from './unique';

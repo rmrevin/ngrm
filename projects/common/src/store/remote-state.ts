@@ -4,6 +4,9 @@ import { catchError, delay, map, switchMap, take, takeUntil, tap } from 'rxjs/op
 import { RemoteStateData, RemoteStateStage } from './shared';
 import { State } from './state';
 
+/**
+ * @deprecated use RemoteStore from package @ngrm/store
+ */
 export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE>> implements OnDestroy
 {
   protected readonly destroyed = new Subject<void>();

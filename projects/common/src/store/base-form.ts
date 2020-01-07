@@ -11,10 +11,16 @@ import {
   ValidatorFn,
 } from '@angular/forms';
 import { ParamMap, Router } from '@angular/router';
-import { cloneDeep, isEqual, pick } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, skipWhile, startWith, takeUntil } from 'rxjs/operators';
 
+const cloneDeep = require('lodash/cloneDeep');
+const isEqual = require('lodash/isEqual');
+const pick = require('lodash/pick');
+
+/**
+ * @deprecated deleted in package @ngrm/forms
+ */
 export interface FormatRuleInterface
 {
   fields: Array<string>;
@@ -22,6 +28,9 @@ export interface FormatRuleInterface
   formatter: (value: any) => any;
 }
 
+/**
+ * @deprecated use FormErrorsCollection from package @ngrm/forms
+ */
 export interface FormErrorsCollection
 {
   [key: string]: ValidationErrors & { children?: FormErrorsCollection };
@@ -29,6 +38,9 @@ export interface FormErrorsCollection
 
 export type FormControlPath = Array<string | number> | string;
 
+/**
+ * @deprecated use NgrmForm from package @ngrm/forms
+ */
 export class BaseForm<T> extends FormGroup implements OnDestroy
 {
   public readonly value: T;

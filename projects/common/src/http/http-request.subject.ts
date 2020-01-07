@@ -1,9 +1,10 @@
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { OnDestroy } from '@angular/core';
-import { cloneDeep } from 'lodash';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { catchError, delay, distinctUntilChanged, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { HttpHeadersCollection } from '../store';
+
+const cloneDeep = require('lodash/cloneDeep');
 
 export enum HttpRequestStage
 {
@@ -23,7 +24,7 @@ export interface HttpRequestState<DATA>
 }
 
 /**
- * @deprecated use RemoteState
+ * @deprecated use RemoteStore
  */
 export class HttpRequestSubject<REQUEST, RESPONSE> implements OnDestroy
 {

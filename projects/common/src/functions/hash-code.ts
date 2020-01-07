@@ -1,4 +1,4 @@
-export function hashCode(input: string): number {
+export function hashCode (input: string): number {
   if (input.length === 0) {
     return 0;
   }

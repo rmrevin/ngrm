@@ -1,8 +1,8 @@
-export function moneyFormat(
+export function moneyFormat (
   value: number,
   withFraction: boolean = false,
   currency: string = 'RUB',
-  locale: string = 'ru-RU'
+  locale: string = 'ru-RU',
 ): string {
   const showFraction = withFraction || value % 1 !== 0;
 
@@ -10,8 +10,8 @@ export function moneyFormat(
     style: 'currency',
     currency,
     minimumFractionDigits: showFraction ? 2 : 0,
-    maximumFractionDigits: showFraction ? 2 : 0
+    maximumFractionDigits: showFraction ? 2 : 0,
   };
 
-  return value || value === 0 ? value.toLocaleString(locale, options).replace(',', '.') : '';
+  return value || value === 0 ? value.toLocaleString(locale, options) : '';
 }

@@ -1,4 +1,4 @@
-export function getScrollbarWidth() {
+export function getScrollbarWidth () {
   const scrollDiv = document.createElement('div');
   scrollDiv.className = 'scrollbar-measure';
   document.body.appendChild(scrollDiv);

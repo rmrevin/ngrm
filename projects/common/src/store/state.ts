@@ -1,12 +1,28 @@
 import { OnDestroy } from '@angular/core';
-import { cloneDeep, isEqual } from 'lodash';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map, skipWhile } from 'rxjs/operators';
 
+const cloneDeep = require('lodash/cloneDeep');
+const isEqual = require('lodash/isEqual');
+
+/**
+ * @deprecated use StateProjectFn from package @ngrm/store
+ */
 export type ProjectFn<STATE, RESULT> = (state: STATE) => RESULT;
+
+/**
+ * @deprecated use StateCompareFn from package @ngrm/store
+ */
 export type CompareFn<STATE> = (a: STATE, b: STATE) => boolean;
+
+/**
+ * @deprecated use StateReducerFn from package @ngrm/store
+ */
 export type ReducerFn<STATE> = (state: STATE) => STATE;
 
+/**
+ * @deprecated use NgrmStore from package @ngrm/store
+ */
 export class State<STATE> extends BehaviorSubject<STATE> implements OnDestroy
 {
   public constructor (protected readonly defaultValue: STATE) {

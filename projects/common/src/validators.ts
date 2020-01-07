@@ -14,6 +14,9 @@ import {
 
 const moment = _moment;
 
+/**
+ * @deprecated use NgrmValidators from package @ngrm/forms
+ */
 // @dynamic
 export class CommonValidators
 {

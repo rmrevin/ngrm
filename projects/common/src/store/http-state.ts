@@ -5,6 +5,9 @@ import { catchError, delay, map, switchMap, take, takeUntil, tap } from 'rxjs/op
 import { HttpHeadersCollection, RemoteStateData, RemoteStateStage } from './shared';
 import { State } from './state';
 
+/**
+ * @deprecated use HttpStore from package @ngrm/store
+ */
 export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE>> implements OnDestroy
 {
   private readonly destroyed = new Subject<void>();

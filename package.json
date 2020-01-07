@@ -8,7 +8,9 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "pub": "yarn publish dist/common --access public --no-git-tag-version"
+    "pub:common": "yarn publish dist/common --access public --no-git-tag-version",
+    "pub:forms": "yarn publish dist/forms --access public --no-git-tag-version",
+    "pub:store": "yarn publish dist/store --access public --no-git-tag-version"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +22,9 @@
     "@angular/platform-browser": "~8.2.3",
     "@angular/platform-browser-dynamic": "~8.2.3",
     "@angular/router": "~8.2.3",
+    "@ngrm/common": "~0.5.0",
+    "@ngrm/forms": "~0.1.0",
+    "@ngrm/store": "~0.1.0",
     "debug": "^4.1.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",

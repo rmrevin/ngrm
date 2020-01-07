@@ -1,3 +1,6 @@
+/**
+ * @deprecated use RemoteStateStage from package @ngrm/store
+ */
 export enum RemoteStateStage
 {
   New = 'new',
@@ -5,6 +8,9 @@ export enum RemoteStateStage
   Success = 'success',
 }
 
+/**
+ * @deprecated use RemoteStateData from package @ngrm/store
+ */
 export interface RemoteStateData<DATA>
 {
   inProgress: boolean;
@@ -14,6 +20,9 @@ export interface RemoteStateData<DATA>
   meta: any;
 }
 
+/**
+ * @deprecated use HttpHeadersCollection from package @ngrm/store
+ */
 export interface HttpHeadersCollection
 {
   [key: string]: Array<string>;
