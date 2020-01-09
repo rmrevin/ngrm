@@ -1,7 +1,9 @@
 import { OnDestroy } from '@angular/core';
 import { untilDestroyed } from '@ngrm/common';
-import { Observable, of, Subject } from 'rxjs';
-import { catchError, delay, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { Observable, Subject, timer } from 'rxjs';
+import { catchError, finalize, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { ErrorAction, FinishAction, StartAction, SuccessAction } from './remote-actions';
+import reducers from './remote-reducers';
 import { RemoteStateData, RemoteStateStage } from './shared';
 import { NgrmStore } from './store';
 
@@ -17,7 +19,7 @@ export class RemoteStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RE
       data: undefined,
       error: undefined,
       meta: undefined,
-    });
+    }, reducers);
   }
 
   /**
@@ -49,28 +51,18 @@ export class RemoteStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RE
   }
 
   private executeRequest (requestFactory: () => Observable<RESPONSE>, delayTime: number = 0): Observable<RESPONSE> {
-    return of(true).pipe(
+    this.dispatch(new StartAction());
+
+    return timer(delayTime, 0).pipe(
       take(1),
-      tap(() => this.update({
-        inProgress: true,
-        error: undefined,
-      })),
-      delay(delayTime),
       switchMap(requestFactory),
       catchError(error => {
-        this.update({
-          stage: RemoteStateStage.Failed,
-          inProgress: false,
-          error,
-        });
+        this.dispatch(new ErrorAction(error));
 
         throw error;
       }),
-      tap((data: RESPONSE) => this.update({
-        stage: RemoteStateStage.Success,
-        inProgress: false,
-        data,
-      })),
+      tap((data: RESPONSE) => this.dispatch(new SuccessAction(data))),
+      finalize(() => this.dispatch(new FinishAction())),
       takeUntil(this.abort),
       untilDestroyed(this),
     );

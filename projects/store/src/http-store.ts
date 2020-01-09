@@ -1,8 +1,10 @@
 import { HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { OnDestroy } from '@angular/core';
 import { untilDestroyed } from '@ngrm/common';
-import { Observable, of, Subject } from 'rxjs';
-import { catchError, delay, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { Observable, Subject, timer } from 'rxjs';
+import { catchError, finalize, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { ErrorAction, FinishAction, StartAction, SuccessAction } from './remote-actions';
+import reducers from './remote-reducers';
 import { HttpHeadersCollection, RemoteStateData, RemoteStateStage } from './shared';
 import { NgrmStore } from './store';
 
@@ -18,7 +20,7 @@ export class HttpStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RESP
       data: undefined,
       error: undefined,
       meta: undefined,
-    });
+    }, reducers);
   }
 
   /**
@@ -50,38 +52,26 @@ export class HttpStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RESP
   }
 
   private executeRequest (requestFactory: () => Observable<HttpResponse<RESPONSE>>, delayTime: number = 0): Observable<RESPONSE> {
-    return of(true).pipe(
+    this.dispatch(new StartAction());
+
+    return timer(delayTime, 0).pipe(
       take(1),
-      tap(() => this.update({
-        inProgress: true,
-        error: undefined,
-      })),
-      delay(delayTime),
       switchMap(requestFactory),
       catchError((response: HttpErrorResponse) => {
-        this.update({
-          stage: RemoteStateStage.Failed,
-          inProgress: false,
-          error: response.error,
-          meta: {
-            url: response.url,
-            status: response.status,
-            headers: exportHeaders(response.headers),
-          },
-        });
-
-        throw response;
-      }),
-      tap((response: HttpResponse<RESPONSE>) => this.update({
-        stage: RemoteStateStage.Success,
-        inProgress: false,
-        data: response.body,
-        meta: {
+        this.dispatch(new ErrorAction(response.error, {
           url: response.url,
           status: response.status,
           headers: exportHeaders(response.headers),
-        },
-      })),
+        }));
+
+        throw response;
+      }),
+      tap((response: HttpResponse<RESPONSE>) => this.dispatch(new SuccessAction(response.body, {
+        url: response.url,
+        status: response.status,
+        headers: exportHeaders(response.headers),
+      }))),
+      finalize(() => this.dispatch(new FinishAction())),
       map((response: HttpResponse<RESPONSE>) => response.body),
       takeUntil(this.abort),
       untilDestroyed(this),
