@@ -1,4 +1,5 @@
 import { OnDestroy } from '@angular/core';
+import { untilDestroyed } from '@ngrm/common';
 import { Observable, of, Subject } from 'rxjs';
 import { catchError, delay, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { RemoteStateData, RemoteStateStage } from './shared';
@@ -6,8 +7,8 @@ import { NgrmStore } from './store';
 
 export class RemoteStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RESPONSE>> implements OnDestroy
 {
-  protected readonly destroyed = new Subject<void>();
-  protected readonly abort = new Subject<void>();
+  private readonly _abort = new Subject<void>();
+  public readonly abort = this._abort.asObservable();
 
   public constructor (private requestTransport: (params?: REQUEST) => Observable<RESPONSE>) {
     super({
@@ -20,17 +21,17 @@ export class RemoteStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RE
   }
 
   /**
-   * Метод для однопоточного получения данных (все предыдущие запросы будут автоматически отменены)
+   * Method for single-threaded data acquisition (all previous requests will be automatically canceled)
    */
   public fetch (params?: REQUEST, delayTime: number = 0): Observable<RESPONSE> {
 
-    this.abort.next();
+    this._abort.next();
 
     return this.send(params, delayTime);
   }
 
   /**
-   * Метод для простой отправки запроса (отменять повторые запросы нужно вручную)
+   * Method for sending a request easily (you need to cancel repeated requests manually)
    */
   public send (params?: REQUEST, delayTime: number = 0): Observable<RESPONSE> {
     return this.executeRequest((): any => {
@@ -39,7 +40,7 @@ export class RemoteStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RE
   }
 
   /**
-   * Метод для отладки состояния зафейлившегося api
+   * Method for debugging failed api state
    */
   public makeFail (delayTime: number = 0, message: string = 'Fake fail emitted'): Observable<RESPONSE> {
     return this.executeRequest(() => {
@@ -70,8 +71,8 @@ export class RemoteStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RE
         inProgress: false,
         data,
       })),
-      takeUntil(this.destroyed),
       takeUntil(this.abort),
+      untilDestroyed(this),
     );
   }
 
@@ -144,11 +145,8 @@ export class RemoteStore<REQUEST, RESPONSE> extends NgrmStore<RemoteStateData<RE
   }
 
   public ngOnDestroy (): void {
-    this.abort.next();
-    this.abort.complete();
-
-    this.destroyed.next();
-    this.destroyed.complete();
+    this._abort.next();
+    this._abort.complete();
 
     super.ngOnDestroy();
   }

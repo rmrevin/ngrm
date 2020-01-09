@@ -1,6 +1,6 @@
 import { Observable, of, timer } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
-import { ActionEffectFn, ActionInterface, ActionReducerFn } from './shared';
+import { ActionEffectFn, Action, ActionReducerFn } from './shared';
 import { NgrmStore } from './store';
 import { isAction } from './utils';
 
@@ -60,17 +60,17 @@ enum Actions
   NewListData = '[test] new list data',
 }
 
-class RequestData implements ActionInterface
+class RequestData implements Action
 {
   readonly type = Actions.RequestData;
 }
 
-class RequestDataFailed implements ActionInterface
+class RequestDataFailed implements Action
 {
   readonly type = Actions.RequestDataFailed;
 }
 
-class NewListData implements ActionInterface
+class NewListData implements Action
 {
   readonly type = Actions.NewListData;
 
@@ -112,7 +112,7 @@ function getEffects () {
   ]);
 }
 
-function newListDataEffect (state: TestStoreStateData, action: RequestData): Observable<ActionInterface> {
+function newListDataEffect (state: TestStoreStateData, action: RequestData): Observable<Action> {
   return requestRemoteData().pipe(
     map(result => new NewListData(result)),
     catchError(() => of(new RequestDataFailed())),

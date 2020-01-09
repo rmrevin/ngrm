@@ -3,9 +3,9 @@ import { isFunction, isObject, untilDestroyed } from '@ngrm/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, filter, map, skipWhile, switchMap, take, tap } from 'rxjs/operators';
 import {
+  Action,
   ActionEffectFn,
   ActionEffectsMap,
-  ActionInterface,
   ActionReducerFn,
   ActionReducersMap,
   StateCompareFn,
@@ -108,9 +108,9 @@ export class NgrmStore<STATE> extends BehaviorSubject<STATE> implements OnDestro
    * Actions dispatcher
    */
 
-  private readonly _dispatcher$ = new EventEmitter<ActionInterface>();
+  private readonly _dispatcher$ = new EventEmitter<Action>();
 
-  public dispatch (action: ActionInterface): void {
+  public dispatch (action: Action): void {
     this._dispatcher$.emit(action);
   }
 
@@ -155,5 +155,7 @@ export class NgrmStore<STATE> extends BehaviorSubject<STATE> implements OnDestro
 
   public ngOnDestroy (): void {
     super.complete();
+
+    this._dispatcher$.complete();
   }
 }
