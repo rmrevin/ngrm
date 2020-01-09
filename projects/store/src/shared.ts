@@ -36,4 +36,11 @@ export interface HttpHeadersCollection
   [key: string]: Array<string>;
 }
 
+export interface CacheItem<T>
+{
+  get (): Observable<T>;
 
+  set (value: T): Observable<T>;
+
+  remove (): Observable<void>;
+}

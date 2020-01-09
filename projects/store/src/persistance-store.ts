@@ -1,16 +1,8 @@
 import { OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { skip, take, takeUntil, tap } from 'rxjs/operators';
+import { CacheItem } from './shared';
 import { NgrmStore } from './store';
-
-export interface CacheItemInterface<T>
-{
-  get (): Observable<T>;
-
-  set (value: T): Observable<T>;
-
-  remove (): Observable<void>;
-}
 
 export class PersistanceStore<STATE> extends NgrmStore<STATE> implements OnDestroy
 {
@@ -21,7 +13,7 @@ export class PersistanceStore<STATE> extends NgrmStore<STATE> implements OnDestr
   private readonly _stopAutosave = new Subject<void>();
 
   public constructor (protected defaultValue: STATE,
-                      private cacheItem: CacheItemInterface<STATE>,
+                      private cacheItem: CacheItem<STATE>,
                       private autoload: boolean = true,
                       private autosave: boolean = true,
   ) {
