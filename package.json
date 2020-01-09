@@ -10,7 +10,8 @@
     "e2e": "ng e2e",
     "pub:common": "yarn publish dist/common --access public --no-git-tag-version",
     "pub:forms": "yarn publish dist/forms --access public --no-git-tag-version",
-    "pub:store": "yarn publish dist/store --access public --no-git-tag-version"
+    "pub:store": "yarn publish dist/store --access public --no-git-tag-version",
+    "pub:moment": "yarn publish dist/moment --access public --no-git-tag-version"
   },
   "private": true,
   "dependencies": {

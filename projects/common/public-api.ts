@@ -12,5 +12,4 @@ export * from './src/pipes';
 
 export * from './src/store';
 export * from './src/operators';
-export * from './src/http';
 export * from './src/validators';

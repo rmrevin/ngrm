@@ -1,7 +1,8 @@
 import { AbstractControl } from '@angular/forms';
-import * as _moment from 'moment';
 import {
   clearPhone,
+  isDate,
+  isMoment,
   validateCardNumber,
   validateInn,
   validateKpp,
@@ -11,8 +12,6 @@ import {
   validateRuPhone,
   validateUuid,
 } from './functions';
-
-const moment = _moment;
 
 /**
  * @deprecated use NgrmValidators from package @ngrm/forms
@@ -25,7 +24,7 @@ export class CommonValidators
       const checked = Object.values(control.value).filter(value => value === true).length;
 
       if (checked < min) {
-        return {atLeastChecked: true};
+        return { atLeastChecked: true };
       }
 
       return null;
@@ -34,10 +33,10 @@ export class CommonValidators
 
   static mustBe (expectedValue: any): (control: AbstractControl) => { mustBe: true } | null {
     return (control: AbstractControl) => {
-      const {value} = control;
+      const { value } = control;
 
       if (value !== expectedValue) {
-        return {mustBe: true};
+        return { mustBe: true };
       }
 
       return null;
@@ -49,7 +48,7 @@ export class CommonValidators
     maxlength: number | null = null,
   ): (control: AbstractControl) => { number: true } | null {
     return (control: AbstractControl) => {
-      const {value} = control;
+      const { value } = control;
 
       let length = '';
 
@@ -62,7 +61,7 @@ export class CommonValidators
       const pattern = new RegExp(`^[0-9]${length}$`);
 
       if (value && !pattern.test(value)) {
-        return {number: true};
+        return { number: true };
       }
 
       return null;
@@ -70,66 +69,66 @@ export class CommonValidators
   }
 
   static ogrn (control: AbstractControl): { ogrn: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     const error = {};
 
     if (value && !validateOgrn(value, error) && !validateOgrnIp(value, error)) {
-      return {ogrn: true};
+      return { ogrn: true };
     }
 
     return null;
   }
 
   static inn (control: AbstractControl): { inn: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     const error = {};
 
     if (value && !validateInn(value, error)) {
-      return {inn: true};
+      return { inn: true };
     }
 
     return null;
   }
 
   static kpp (control: AbstractControl): { kpp: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     const error = {};
 
     if (value && !validateKpp(value, error)) {
-      return {kpp: true};
+      return { kpp: true };
     }
 
     return null;
   }
 
   static phone (control: AbstractControl): { phone: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     if (value && clearPhone(value) !== '7' && !validateRuPhone(value)) {
-      return {phone: true};
+      return { phone: true };
     }
 
     return null;
   }
 
   static passport (control: AbstractControl): { passport: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     if (value && !/^[0-9]{4}\s[0-9]{6}$/.test(value)) {
-      return {passport: true};
+      return { passport: true };
     }
 
     return null;
   }
 
   static fnType (control: AbstractControl): { fnType: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     if (value && !/^(15|36)$/.test(value)) {
-      return {fnType: true};
+      return { fnType: true };
     }
 
     return null;
@@ -137,10 +136,10 @@ export class CommonValidators
 
   static in (values: Array<string | number | boolean>): (control: AbstractControl) => { in: true } | null {
     return (control: AbstractControl) => {
-      const {value} = control;
+      const { value } = control;
 
       if (value && values.indexOf(value) === -1) {
-        return {in: true};
+        return { in: true };
       }
 
       return null;
@@ -149,10 +148,10 @@ export class CommonValidators
 
   static compare (getter: () => string): (control: AbstractControl) => { notEquals: true } | null {
     return (control: AbstractControl) => {
-      const {value} = control;
+      const { value } = control;
 
       if (getter() !== value) {
-        return {notEquals: true};
+        return { notEquals: true };
       }
 
       return null;
@@ -160,30 +159,30 @@ export class CommonValidators
   }
 
   static date (control: AbstractControl): { date: true } | null {
-    const {value} = control;
+    const { value } = control;
 
-    if (value && !moment.isMoment(value) && !moment.isDate(value) && !moment(value).isValid()) {
-      return {date: true};
+    if (value && (!isDate(value) || !isMoment(value))) {
+      return { date: true };
     }
 
     return null;
   }
 
   static edoId (control: AbstractControl): { edoId: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     if (value && !/^2[a-z]{2}[a-z0-9-+_]{1,43}$/i.test(value)) {
-      return {edoId: true};
+      return { edoId: true };
     }
 
     return null;
   }
 
   static card (control: AbstractControl): { card: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     if (value && !validateCardNumber(value)) {
-      return {card: true};
+      return { card: true };
     }
 
     return null;
@@ -191,10 +190,10 @@ export class CommonValidators
 
   // эта валидация проверяет, что строка является валидным uuid
   static uuid (control: AbstractControl): { uuid: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     if (value && !validateUuid(value)) {
-      return {uuid: true};
+      return { uuid: true };
     }
 
     return null;
@@ -202,10 +201,10 @@ export class CommonValidators
 
   // эта валидация проверяет, что строка "похожа" на uuid
   static randomUuid (control: AbstractControl): { uuid: true } | null {
-    const {value} = control;
+    const { value } = control;
 
     if (value && !validateRandomUuid(value)) {
-      return {uuid: true};
+      return { uuid: true };
     }
 
     return null;
@@ -218,7 +217,7 @@ export class CommonValidators
       const rightCtrl = control.get(rightKey);
 
       if (leftCtrl.value && rightCtrl.value && leftCtrl.value >= rightCtrl.value) {
-        return {lt: true};
+        return { lt: true };
       }
 
       return null;
@@ -232,7 +231,7 @@ export class CommonValidators
       const rightCtrl = control.get(rightKey);
 
       if (leftCtrl.value && rightCtrl.value && leftCtrl.value > rightCtrl.value) {
-        return {lte: true};
+        return { lte: true };
       }
 
       return null;
@@ -246,7 +245,7 @@ export class CommonValidators
       const rightCtrl = control.get(rightKey);
 
       if (leftCtrl.value && rightCtrl.value && leftCtrl.value <= rightCtrl.value) {
-        return {gt: true};
+        return { gt: true };
       }
 
       return null;
@@ -260,7 +259,7 @@ export class CommonValidators
       const rightCtrl = control.get(rightKey);
 
       if (leftCtrl.value && rightCtrl.value && leftCtrl.value < rightCtrl.value) {
-        return {gte: true};
+        return { gte: true };
       }
 
       return null;

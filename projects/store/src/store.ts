@@ -109,6 +109,7 @@ export class NgrmStore<STATE> extends BehaviorSubject<STATE> implements OnDestro
    */
 
   private readonly _dispatcher$ = new EventEmitter<Action>();
+  public readonly dispatcher$ = this._dispatcher$.asObservable();
 
   public dispatch (action: Action): void {
     this._dispatcher$.emit(action);

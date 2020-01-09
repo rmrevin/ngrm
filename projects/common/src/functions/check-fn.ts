@@ -1,8 +1,3 @@
-import * as _moment from 'moment';
-import { Moment } from 'moment';
-
-const moment = _moment;
-
 const isEqual = require('lodash/isEqual');
 const pick = require('lodash/pick');
 
@@ -56,8 +51,8 @@ export function isDate (target: any): target is Date {
   return Object.prototype.toString.call(target) === '[object Date]';
 }
 
-export function isMoment (target: any): target is Moment {
-  return moment.isMoment(target);
+export function isMoment (target: any): boolean {
+  return Object.prototype.hasOwnProperty.call(target, '_isAMomentObject');
 }
 
 export function hasOwnProperty (target: object, propertyName: string): boolean {

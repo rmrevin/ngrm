@@ -107,6 +107,41 @@
           }
         }
       }
+    },
+    "moment": {
+      "projectType": "library",
+      "root": "projects/moment",
+      "sourceRoot": "projects/moment/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/moment/tsconfig.lib.json",
+            "project": "projects/moment/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/moment/src/test.ts",
+            "tsConfig": "projects/moment/tsconfig.spec.json",
+            "karmaConfig": "projects/moment/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/moment/tsconfig.lib.json",
+              "projects/moment/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "common"

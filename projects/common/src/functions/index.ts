@@ -12,5 +12,4 @@ export * from './punto-switcher-ru-en';
 export * from './safe-regexp-string';
 export * from './scroll-to';
 export * from './unique';
-export * from './utc-date';
 export * from './validate';
