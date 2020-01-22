@@ -1,8 +1,8 @@
-import { ActionReducerFn } from '@ngrm/store';
+import { ActionReducerFn, ReducersMap } from '@ngrm/store';
 import { Actions, NewMessageAction, ReloadAction, ReloadFailedAction } from './actions';
 import { UiStoreStateData } from './store';
 
-export default new Map<string, ActionReducerFn<UiStoreStateData>>([
+export default new ReducersMap<string, ActionReducerFn<UiStoreStateData>>([
   [Actions.NewMessageAction, newMessageReducer],
   [Actions.ReloadAction, reloadStartedReducer],
   [Actions.ReloadFailedAction, reloadFailedReducer],

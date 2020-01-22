@@ -1,7 +1,8 @@
+import { ReducersMap } from './reducers-map';
 import { Actions, ErrorAction, FinishAction, StartAction, SuccessAction } from './remote-actions';
 import { ActionReducerFn, RemoteStateData, RemoteStateStage } from './shared';
 
-export default new Map<string, ActionReducerFn<RemoteStateData<any>>>([
+export default new ReducersMap<string, ActionReducerFn<RemoteStateData<any>>>([
   [Actions.START, requestStartReducer],
   [Actions.ERROR, requestFailedReducer],
   [Actions.SUCCESS, requestSuccessReducer],

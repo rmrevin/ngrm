@@ -120,7 +120,7 @@ export class NgrmStore<STATE> extends BehaviorSubject<STATE> implements OnDestro
    */
 
   public registerReducers (reducersMap: ActionReducersMap<STATE>): void {
-    reducersMap.forEach((handler, type) => this.registerReducer(type, handler));
+    reducersMap.forEach(([type, handler]) => this.registerReducer(type, handler));
   }
 
   public registerReducer (actionType: string, handler: ActionReducerFn<STATE>): void {
@@ -135,7 +135,7 @@ export class NgrmStore<STATE> extends BehaviorSubject<STATE> implements OnDestro
    */
 
   public registerEffects (effectsMap: ActionEffectsMap<STATE>): void {
-    effectsMap.forEach((handler, type) => this.registerEffect(type, handler));
+    effectsMap.forEach(([type, handler]) => this.registerEffect(type, handler));
   }
 
   public registerEffect (actionType: string, handler: ActionEffectFn<STATE>): void {

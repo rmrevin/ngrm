@@ -1,6 +1,8 @@
 import { Observable, of, timer } from 'rxjs';
 import { catchError, map, take } from 'rxjs/operators';
-import { ActionEffectFn, Action, ActionReducerFn } from './shared';
+import { EffectsMap } from './effects-map';
+import { ReducersMap } from './reducers-map';
+import { Action, ActionEffectFn, ActionEffectsMap, ActionReducerFn, ActionReducersMap } from './shared';
 import { NgrmStore } from './store';
 import { isAction } from './utils';
 
@@ -77,8 +79,8 @@ class NewListData implements Action
   constructor (public readonly items: Array<string>) {}
 }
 
-function getReducers () {
-  return new Map<string, ActionReducerFn<TestStoreStateData>>([
+function getReducers (): ActionReducersMap<TestStoreStateData> {
+  return new ReducersMap<string, ActionReducerFn<TestStoreStateData>>([
     [Actions.NewListData, newListDataReducer],
     [Actions.RequestData, requestDataStartedReducer],
     [Actions.RequestDataFailed, requestDataFailedReducer],
@@ -106,8 +108,8 @@ function newListDataReducer (state: TestStoreStateData, action: NewListData): Pa
   };
 }
 
-function getEffects () {
-  return new Map<string, ActionEffectFn<TestStoreStateData>>([
+function getEffects (): ActionEffectsMap<TestStoreStateData> {
+  return new EffectsMap<string, ActionEffectFn<TestStoreStateData>>([
     [Actions.RequestData, newListDataEffect],
   ]);
 }
