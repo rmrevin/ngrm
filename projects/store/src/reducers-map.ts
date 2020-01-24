@@ -31,8 +31,10 @@ export class ReducersMap<K, V>
   }
 
   public clear (): void {
-    if (this.value.length > 0) {
-      this.value.splice(0, this.value.length);
-    }
+    this.value = [];
+  }
+
+  public delete (action: K): void {
+    this.value = this.value.filter(([key]) => key !== action);
   }
 }

@@ -1,3 +1,3 @@
 import { Debug } from 'debug';
 
-export const dbg: Debug = require('debug/dist/debug.js');
+export const debug: Debug = require('debug/dist/debug.js');

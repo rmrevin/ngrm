@@ -1,7 +1,7 @@
 import { Inject, LOCALE_ID, Pipe, PipeTransform } from '@angular/core';
 import { intlPlural } from '../../functions/intl-plural';
 
-@Pipe({name: 'plural'})
+@Pipe({ name: 'plural' })
 export class PluralPipe implements PipeTransform
 {
   public constructor (@Inject(LOCALE_ID) private locale: string) {}
@@ -15,6 +15,6 @@ export class PluralPipe implements PipeTransform
     defaultValue = '[pluralization failed ({type})]',
     locale: string = this.locale,
   ): string {
-    return intlPlural(locale, value, {one, few, many, other}, defaultValue);
+    return intlPlural(locale, value, { one, few, many, other }, defaultValue);
   }
 }

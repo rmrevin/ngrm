@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({name: 'srcset'})
+@Pipe({ name: 'srcset' })
 export class SrcsetPipe implements PipeTransform
 {
   public transform (value: { [key: string]: string }): string {

@@ -25,7 +25,7 @@
     "@angular/router": "~8.2.3",
     "@ngrm/common": "~0.5.0",
     "@ngrm/forms": "~0.1.0",
-    "@ngrm/store": "~0.1.0",
+    "@ngrm/store": "~0.2.0",
     "debug": "^4.1.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",

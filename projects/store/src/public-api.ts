@@ -1,4 +1,6 @@
 export * from './shared';
+export * from './reducers-map';
+export * from './effects-map';
 export * from './utils';
 export * from './operators';
 export * from './store';

@@ -2,7 +2,7 @@ import { Inject, Pipe, PipeTransform } from '@angular/core';
 import { ruPpuntoSwitcher } from '../../functions';
 import { DEBUG } from '../../shared';
 
-@Pipe({name: 'highlight'})
+@Pipe({ name: 'highlight' })
 export class HighlightPipe implements PipeTransform
 {
   public constructor (@Inject(DEBUG) private debug: boolean = false) {}

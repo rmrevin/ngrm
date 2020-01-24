@@ -1,15 +1,15 @@
 import { Inject, Pipe, PipeTransform } from '@angular/core';
-import { dbg } from '../../functions';
+import { debug } from '../../functions';
 import { DEBUG } from '../../shared';
 
-@Pipe({name: 'dbg'})
-export class DbgPipe implements PipeTransform
+@Pipe({ name: 'debug' })
+export class DebugPipe implements PipeTransform
 {
   public constructor (@Inject(DEBUG) private debug: boolean = false) {}
 
-  public transform (value: any, namespace: string = 'app:dbg-pipe'): string {
+  public transform (value: any, namespace: string = 'app:debug'): string {
     if (this.debug) {
-      dbg(namespace)(value);
+      debug(namespace)(value);
     }
 
     return '';

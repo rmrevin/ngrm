@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
-import { DbgPipe } from './dbg.pipe';
+import { DebugPipe } from './debug.pipe';
 import { LogPipe } from './log.pipe';
 
-const pipes = [DbgPipe, LogPipe];
+const pipes = [DebugPipe, LogPipe];
 
 @NgModule({
   declarations: pipes,
