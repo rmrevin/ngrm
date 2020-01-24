@@ -2,4 +2,4 @@
  * Public API Surface of common
  */
 
-export * from './src/index';
+export * from './src/public-api';
