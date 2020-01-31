@@ -13,8 +13,8 @@ export class PluralPipe implements PipeTransform
     many: string,
     other: string,
     defaultValue = '[pluralization failed ({type})]',
-    locale: string = this.locale,
+    locale?: string,
   ): string {
-    return intlPlural(locale, value, { one, few, many, other }, defaultValue);
+    return intlPlural(locale || this.locale, value, { one, few, many, other }, defaultValue);
   }
 }

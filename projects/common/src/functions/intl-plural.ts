@@ -1,3 +1,5 @@
+import { hasOwnProperty } from './check-fn';
+
 export function intlPlural (
   locale: string,
   value: number,
@@ -11,5 +13,7 @@ export function intlPlural (
 ): string {
   const type = new Intl.PluralRules(locale).select(value);
 
-  return variants[type] ? variants[type].replace('{n}', value) : defaultValue.replace('{type}', type);
+  return hasOwnProperty(variants, type)
+    ? variants[type].replace('{n}', String(value))
+    : defaultValue.replace('{type}', String(type));
 }

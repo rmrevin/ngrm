@@ -1,4 +1,4 @@
-export function numberFormat (value: number, currency: string = 'RUB', locale: string = 'ru-RU'): string {
+export function numberFormat (value: number, locale: string = 'ru-RU'): string {
   const withFraction = value % 1 !== 0;
 
   const options: Intl.NumberFormatOptions = {

@@ -1,5 +1,5 @@
 import { Inject, Pipe, PipeTransform } from '@angular/core';
-import { ruPpuntoSwitcher } from '../../functions';
+import { debugFn, ruPpuntoSwitcher } from '../../functions';
 import { DEBUG } from '../../shared';
 
 @Pipe({ name: 'highlight' })
@@ -24,7 +24,7 @@ export class HighlightPipe implements PipeTransform
       return value.replace(pattern, '<mark>$1</mark>');
     } catch (e) {
       if (this.debug && console) {
-        console.warn(e);
+        debugFn('@ngrm:HighlightPipe')(e);
       }
 
       return value;

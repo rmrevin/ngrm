@@ -31,6 +31,17 @@ export class CommonValidators
     };
   }
 
+  static atLeastSelected (min = 1): (control: AbstractControl) => { atLeastSelected: true } | null {
+    return (control: AbstractControl) => {
+
+      if (control.value.length < min) {
+        return { atLeastSelected: true };
+      }
+
+      return null;
+    };
+  }
+
   static mustBe (expectedValue: any): (control: AbstractControl) => { mustBe: true } | null {
     return (control: AbstractControl) => {
       const { value } = control;
@@ -188,7 +199,9 @@ export class CommonValidators
     return null;
   }
 
-  // эта валидация проверяет, что строка является валидным uuid
+  /**
+   * this validation checks that the string is valid uuid
+   */
   static uuid (control: AbstractControl): { uuid: true } | null {
     const { value } = control;
 
@@ -199,7 +212,9 @@ export class CommonValidators
     return null;
   }
 
-  // эта валидация проверяет, что строка "похожа" на uuid
+  /**
+   * this validation checks that the string is "similar" to uuid
+   */
   static randomUuid (control: AbstractControl): { uuid: true } | null {
     const { value } = control;
 
