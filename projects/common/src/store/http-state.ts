@@ -6,7 +6,7 @@ import { HttpHeadersCollection, RemoteStateData, RemoteStateStage } from './shar
 import { State } from './state';
 
 /**
- * @deprecated use HttpStore from package @ngrm/store
+ * @deprecated use HttpSource from package @ngrm/store
  */
 export class HttpState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE>> implements OnDestroy
 {

@@ -5,5 +5,5 @@ export * from './utils';
 export * from './operators';
 export * from './store';
 export * from './persistance-store';
-export * from './remote-store';
-export * from './http-store';
+export * from './remote-source';
+export * from './http-source';

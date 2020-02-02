@@ -5,7 +5,7 @@ import { RemoteStateData, RemoteStateStage } from './shared';
 import { State } from './state';
 
 /**
- * @deprecated use RemoteStore from package @ngrm/store
+ * @deprecated use RemoteSource from package @ngrm/store
  */
 export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE>> implements OnDestroy
 {

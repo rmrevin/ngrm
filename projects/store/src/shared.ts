@@ -28,7 +28,7 @@ export interface RemoteStateData<DATA>
 {
   inProgress: boolean;
   stage: RemoteStateStage;
-  data: Readonly<DATA> | undefined;
+  data: DATA | undefined;
   error: any | undefined;
   meta: any;
 }
