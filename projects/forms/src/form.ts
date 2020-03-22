@@ -15,6 +15,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, skipWhile, startWith, takeUntil } from 'rxjs/operators';
 
 const cloneDeep = require('lodash/cloneDeep');
+const pick = require('lodash/pick');
 
 export interface FormErrorsCollection
 {
@@ -41,6 +42,9 @@ export class NgrmForm<T> extends FormGroup implements OnDestroy
 
   private readonly _destroyed$ = new EventEmitter<void>();
   public readonly destroyed$ = this._destroyed$.asObservable();
+
+  private readonly _reset$ = new EventEmitter<void>();
+  public readonly reset$ = this._reset$.asObservable();
 
   protected formInstance: FormGroupDirective;
 
@@ -75,6 +79,7 @@ export class NgrmForm<T> extends FormGroup implements OnDestroy
     this._value$.complete();
     this._snapshot$.complete();
     this._submitted$.complete();
+    this._reset$.complete();
 
     this._destroyed$.next();
     this._destroyed$.complete();
@@ -190,6 +195,14 @@ export class NgrmForm<T> extends FormGroup implements OnDestroy
 
     this.markAsUntouched();
     this.markAsPristine();
+
+    this._reset$.emit();
+  }
+
+  public resetControls (controlsPath: Array<string>): void {
+    const patch = pick(this.defaultValue, controlsPath);
+
+    this.patchValue(patch);
   }
 
   public resetErrors (): void {
@@ -207,7 +220,7 @@ export class NgrmForm<T> extends FormGroup implements OnDestroy
 
   public setError (controlId: string, error: string, value: any = true): (is: boolean) => void {
     return (isInvalid: boolean): void => {
-      const ctrl = this.control(controlId);
+      const ctrl = this.get(controlId);
 
       const nextErrors = {
         ...(ctrl.errors || {}),
