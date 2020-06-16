@@ -9,7 +9,7 @@ export class MoneyPipe implements PipeTransform
                       @Inject(CURRENCY) private currency: string,
   ) {}
 
-  public transform (value: number,
+  public transform (value: number | string,
                     withFraction: boolean = false,
                     currency?: string,
                     locale?: string,
