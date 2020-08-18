@@ -64,7 +64,7 @@ export class NgrmForm<T> extends FormGroup implements OnDestroy
     this.valueChanges.pipe(
       takeUntil(this.destroyed$),
       startWith(this.value),
-    ).subscribe(this._value$);
+    ).subscribe(() => this._value$.next(this.getRawValue()));
 
     this.makeSnapshot();
   }
@@ -121,7 +121,7 @@ export class NgrmForm<T> extends FormGroup implements OnDestroy
   }
 
   public makeSnapshot (): void {
-    this._snapshot$.next(cloneDeep(this.value));
+    this._snapshot$.next(cloneDeep(this.getRawValue()));
   }
 
   public get (id: FormControlPath): AbstractControl | null {
