@@ -1,4 +1,4 @@
-import { EventEmitter, OnDestroy } from '@angular/core';
+import { Directive, EventEmitter, OnDestroy } from '@angular/core';
 import {
   AbstractControl,
   AbstractControlOptions,
@@ -24,6 +24,7 @@ export interface FormErrorsCollection
 
 export type FormControlPath = Array<string | number> | string;
 
+@Directive()
 export class NgrmForm<T> extends FormGroup implements OnDestroy
 {
   public readonly value: T;

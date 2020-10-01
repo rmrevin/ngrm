@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, EventEmitter, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Directive, EventEmitter, OnDestroy } from '@angular/core';
 import {
   AbstractControl,
   AbstractControlOptions,
@@ -41,6 +41,7 @@ export type FormControlPath = Array<string | number> | string;
 /**
  * @deprecated use NgrmForm from package @ngrm/forms
  */
+@Directive()
 export class BaseForm<T> extends FormGroup implements OnDestroy
 {
   public readonly value: T;

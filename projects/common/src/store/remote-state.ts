@@ -1,4 +1,4 @@
-import { OnDestroy } from '@angular/core';
+import { Directive, OnDestroy } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { catchError, delay, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { RemoteStateData, RemoteStateStage } from './shared';
@@ -7,6 +7,7 @@ import { State } from './state';
 /**
  * @deprecated use RemoteSource from package @ngrm/store
  */
+@Directive()
 export class RemoteState<REQUEST, RESPONSE> extends State<RemoteStateData<RESPONSE>> implements OnDestroy
 {
   protected readonly destroyed = new Subject<void>();

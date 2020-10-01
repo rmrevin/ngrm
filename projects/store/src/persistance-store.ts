@@ -1,9 +1,10 @@
-import { OnDestroy } from '@angular/core';
+import { Directive, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { skip, take, takeUntil, tap } from 'rxjs/operators';
 import { CacheItem } from './shared';
 import { NgrmStore } from './store';
 
+@Directive()
 export class PersistanceStore<STATE> extends NgrmStore<STATE> implements OnDestroy
 {
   private _autosaveEnabled: boolean;

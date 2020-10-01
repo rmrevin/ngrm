@@ -1,4 +1,4 @@
-import { OnDestroy } from '@angular/core';
+import { Directive, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { skip, take, takeUntil, tap } from 'rxjs/operators';
 import { State } from './state';
@@ -15,6 +15,7 @@ export interface CacheItemInterface<T>
 /**
  * @deprecated use PersistanceStore from package @ngrm/store
  */
+@Directive()
 export class PersistState<STATE> extends State<STATE> implements OnDestroy
 {
   private ɵautosaveEnabled: boolean;

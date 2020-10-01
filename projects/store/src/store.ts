@@ -1,4 +1,4 @@
-import { EventEmitter, OnDestroy } from '@angular/core';
+import { Directive, EventEmitter, OnDestroy } from '@angular/core';
 import { isFunction, isObject, untilDestroyed } from '@ngrm/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, filter, map, skipWhile, switchMap, take, tap } from 'rxjs/operators';
@@ -17,6 +17,7 @@ import { wrapIntoObservable } from './utils';
 const cloneDeep = require('lodash/cloneDeep');
 const isEqual = require('lodash/isEqual');
 
+@Directive()
 export class NgrmStore<STATE> extends BehaviorSubject<STATE> implements OnDestroy
 {
   public constructor (protected readonly defaultValue: STATE,

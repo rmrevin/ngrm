@@ -1,8 +1,9 @@
-import { OnDestroy } from '@angular/core';
+import { Directive, OnDestroy } from '@angular/core';
 import { untilDestroyed } from '@ngrm/common';
 import { Observable, Subject, timer } from 'rxjs';
 import { switchMap, take, takeUntil } from 'rxjs/operators';
 
+@Directive()
 export class RemoteSource<REQUEST, RESPONSE> implements OnDestroy
 {
   private readonly _abort = new Subject<void>();

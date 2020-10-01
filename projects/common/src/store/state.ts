@@ -1,4 +1,4 @@
-import { OnDestroy } from '@angular/core';
+import { Directive, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map, skipWhile } from 'rxjs/operators';
 
@@ -23,6 +23,7 @@ export type ReducerFn<STATE> = (state: STATE) => STATE;
 /**
  * @deprecated use NgrmStore from package @ngrm/store
  */
+@Directive()
 export class State<STATE> extends BehaviorSubject<STATE> implements OnDestroy
 {
   public constructor (protected readonly defaultValue: STATE) {
